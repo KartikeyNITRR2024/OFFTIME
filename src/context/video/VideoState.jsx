@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import VideoContext from "./videocontext";
-import Microservices from "../../property/microservices";
 import NotificationContext from "../notification/notificationcontext";
 import { toast } from "react-toastify";
+import Microservices from "../../property/microservices";
 
 export default function VideoState(props) {
   const notificationContext = useContext(NotificationContext);

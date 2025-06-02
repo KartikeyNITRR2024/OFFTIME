@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
-import MobileOption from './mobileoption';
-import DesktopOption from './desktopoption';
-import UserContext from '../../context/user/usercontext';
+import MobileOption from './MobileOption';
+import DesktopOption from './DesktopOption';
+import UserContext from '../../context/user/UserContext';
 
 const VideoPlayerMain = ({ trimmedCode }) => {
   const [showDevices, setShowDevices] = useState(false);

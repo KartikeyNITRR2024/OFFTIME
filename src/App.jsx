@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Landing from "./pages/landing";
-import Home from "./pages/home";
-import VideoState from "./context/video/videostate";
-import NotificationState from "./context/notification/notificationstate";
-import UserState from "./context/user/userstate";
+import Landing from "./pages/Landing";
+import Home from "./pages/Home";
+import VideoState from "./context/video/VideoState";
+import NotificationState from "./context/notification/NotificationState";
+import UserState from "./context/user/UserState";
 
 function App() {
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import SideNavBar from './sidenavbar';
+import SideNavBar from './SideNavbar';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const Header = () => {

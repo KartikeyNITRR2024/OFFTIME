@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import NotificationContext from "./notificationcontext";
+import NotificationContext from "./NotificationContext";
 
 export default function NotificationState(props) {
   const [showNotification, setShowNotification] = useState(false);

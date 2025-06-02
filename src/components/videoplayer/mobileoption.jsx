@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import VideoContext from '../../context/video/videovontext';
-import UserContext from '../../context/user/usercontext';
+import VideoContext from '../../context/video/VideoContext';
+import UserContext from '../../context/user/UserContext';
 
 const convertToEmbedUrl = (url) => {
   try {
@@ -117,18 +117,9 @@ const MobileOption = ({ trimmedCode }) => {
             : { ...field, isPlaying: false }
         )
       );
-      // setSelectedDevice('desktop');
     } else {
       alert('Failed to play video: ' + (result.message || 'Unknown error'));
     }
-  };
-
-  const handlePause = (id) => {
-    setFields(prev =>
-      prev.map(field =>
-        field.id === id ? { ...field, isPlaying: false } : field
-      )
-    );
   };
 
   const handleDelete = async (id) => {

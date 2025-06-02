@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import UserContext from "./usercontext";
-import VideoContext from "../video/videocontext";
-import Microservices from "../../property/microservices";
+import UserContext from "./UserContext";
+import VideoContext from "../video/VideoContext";
+import Microservices from "../../property/Microservices";
 
 export default function UserState(props) {
   const { setVideos, setCurrentVideo } = useContext(VideoContext);

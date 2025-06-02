@@ -1,12 +1,12 @@
 import React, { useState, useContext } from 'react';
-import VideoContext from '../../context/video/videocontext';
-import Loader from '../loader/loader';
+import VideoContext from '../../context/video/VideoContext';
+import Loader from '../loader/Loader';
 
 const MobileOption = () => {
   const [width, setWidth] = useState(560);
   const [height, setHeight] = useState(315);
   const [audioOnly, setAudioOnly] = useState(false);
-  const { currentVideo, updateVideo } = useContext(VideoContext);
+  const { currentVideo } = useContext(VideoContext);
 
   if (!currentVideo) {
     return <Loader />;

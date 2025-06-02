@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../components/header/header';
-import Footer from '../components/footer/footer';
-import VideoPlayerMain from '../components/videoplayer/videoplayermain';
-import Notification from '../components/notification/notification';
+import Header from '../components/header/Header';
+import Footer from '../components/footer/Footer';
+import VideoPlayerMain from '../components/videoplayer/VideoPlayerMain';
+import Notification from '../components/notification/Notification';
 
 const Home = () => {
     const { code } = useParams();

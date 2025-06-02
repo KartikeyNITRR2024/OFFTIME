@@ -45,10 +45,15 @@ const VideoPlayerMain = ({ trimmedCode }) => {
     if (showDevices) setSelectedDevice(null);
   };
 
-  const async handleDeviceSelect = (device) => {
-    setSelectedDevice(device);
+  const handleDeviceSelect = async (device) => {
+  setSelectedDevice(device);
+  try {
     await createOrUpdateCode(trimmedCode);
-  };
+  } catch (error) {
+    console.error('Error during createOrUpdateCode:', error);
+  }
+};
+
 
   return (
     <div className="w-full h-full">

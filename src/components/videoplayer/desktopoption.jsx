@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
-import VideoContext from '../../context/video/VideoContext';
-import Loader from '../loader/Loader';
+import VideoContext from '../../context/video/videocontext';
+import Loader from '../loader/loader';
 
 const MobileOption = () => {
   const [width, setWidth] = useState(560);

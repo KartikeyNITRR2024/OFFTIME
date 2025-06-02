@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import VideoContext from '../../context/video/VideoContext';
-import UserContext from '../../context/user/UserContext';
+import VideoContext from '../../context/video/videovontext';
+import UserContext from '../../context/user/usercontext';
 
 const convertToEmbedUrl = (url) => {
   try {

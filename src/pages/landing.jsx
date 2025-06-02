@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
-import Header from '../components/header/Header';
-import Footer from '../components/footer/Footer';
+import Header from '../components/header/header';
+import Footer from '../components/footer/footer';
 import { useNavigate } from 'react-router-dom'; 
-import UserContext from '../context/user/UserContext'; // adjust the path if needed
+import UserContext from '../context/user/usercontext'; // adjust the path if needed
 
 const Landing = () => {
     const [code, setCode] = useState('');

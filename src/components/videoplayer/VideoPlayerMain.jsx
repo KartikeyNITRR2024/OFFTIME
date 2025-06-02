@@ -45,8 +45,9 @@ const VideoPlayerMain = ({ trimmedCode }) => {
     if (showDevices) setSelectedDevice(null);
   };
 
-  const handleDeviceSelect = (device) => {
+  const async handleDeviceSelect = (device) => {
     setSelectedDevice(device);
+    await createOrUpdateCode(trimmedCode);
   };
 
   return (

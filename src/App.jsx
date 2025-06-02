@@ -2,9 +2,9 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Landing from "./pages/landing";
 import Home from "./pages/home";
-import UserState from "./context/user/userstate.jsx";
 import VideoState from "./context/video/videostate";
 import NotificationState from "./context/notification/notificationstate";
+import UserState from "./context/user/userstate";
 
 function App() {
 

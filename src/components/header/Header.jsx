@@ -29,10 +29,10 @@ const Header = () => {
             <div className='navbar'>
                 <div className='flex justify-between items-center py-3 px-8'>
                     <div className='logo text-center lg:hidden'>
-                        <img src='/src/assets/images/logos/whiteinbluelogo.png' alt='Logo' className='h-9 inline-block mr-2' />
+                        <img src='/assets/images/logos/whiteinbluelogo.png' alt='Logo' className='h-9 inline-block mr-2' />
                     </div>
                     <div className='logo text-center hidden lg:inline-block'>
-                        <img src='/src/assets/images/logos/Complete Logo.png' alt='Logo' className='h-10 inline-block mr-2' />
+                        <img src='/assets/images/logos/Complete Logo.png' alt='Logo' className='h-10 inline-block mr-2' />
                     </div>
                     {isCodePresentInUrl && (<><div className='hamburger inline-block p-4 cursor-pointer lg:hidden' onClick={toggleSidebar}>
                         <div className='line h-1 w-8 my-1 bg-white'></div>

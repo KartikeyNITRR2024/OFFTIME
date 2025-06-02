@@ -82,13 +82,13 @@ const Landing = () => {
                         </div>
                         {success == false && (
                             <p className="mt-3 text-sm text-red-600 flex items-center">
-                                <img src="/src/assets/images/landingpage/allreadyused.png" alt="error" className="h-5 w-5 mr-2" />
+                                <img src="/assets/images/landingpage/allreadyused.png" alt="error" className="h-5 w-5 mr-2" />
                                 {message}
                             </p>
                         )}
                         {success && (
                             <p className="mt-3 text-sm text-green-600 flex items-center">
-                                <img src="/src/assets/images/landingpage/right.png" alt="success" className="h-5 w-5 mr-2" />
+                                <img src="/assets/images/landingpage/right.png" alt="success" className="h-5 w-5 mr-2" />
                                 {message}
                             </p>
                         )}

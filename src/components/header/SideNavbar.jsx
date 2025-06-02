@@ -8,7 +8,7 @@ const SideNavBar = ({ isOpen, onClose }) => {
             <div className="p-6">
                 <button onClick={onClose} className="text-white text-2xl absolute top-4 right-6">&times;</button>
                 <div className='logo text-center inline-block'>
-                        <img src='/src/assets/images/logos/Complete Logo.png' alt='Logo' className='h-10 inline-block mr-2' />
+                        <img src='/assets/images/logos/Complete Logo.png' alt='Logo' className='h-10 inline-block mr-2' />
                 </div>
                 <div className='my-4'>
                     <ul className="space-y-4">

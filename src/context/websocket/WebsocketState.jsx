@@ -28,7 +28,7 @@ export default function WebsocketState(props) {
         return { success: true, message: "Connection initiated." };
       },
       onStompError: (frame) => {
-        toast.update(toastId, { render: "Failed to connect with server", type: "error", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: "Failed to connect with server", type: "error", isLoading: false, autoClose: 1000 });
       },
       reconnectDelay: 5000,
     });

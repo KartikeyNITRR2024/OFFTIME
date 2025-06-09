@@ -59,14 +59,14 @@ export default function VideoState(props) {
       const result = await response.json();
 
       if (result?.success) {
-        toast.update(toastId, { render: "Video deleted successfully", type: "success", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: "Video deleted successfully", type: "success", isLoading: false, autoClose: 1000 });
         return { success: true, message: result.message };
       } else {
-        toast.update(toastId, { render: "Failed to delete video", type: "error", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: "Failed to delete video", type: "error", isLoading: false, autoClose: 1000 });
         return { success: false, message: result.message || "Delete failed." };
       }
     } catch (error) {
-      toast.update(toastId, { render: "Error deleting video", type: "error", isLoading: false, autoClose: 3000 });
+      toast.update(toastId, { render: "Error deleting video", type: "error", isLoading: false, autoClose: 1000 });
       return { success: false, message: error.message };
     }
   };
@@ -100,14 +100,14 @@ export default function VideoState(props) {
       if (result?.success) {
         setCurrentVideo(result.data);
         toast.dismiss(toastId);
-        //toast.update(toastId, { render: "Current video set successfully", type: "success", isLoading: false, autoClose: 3000 });
+        //toast.update(toastId, { render: "Current video set successfully", type: "success", isLoading: false, autoClose: 1000 });
         return { success: true, data: result.data };
       } else {
-        toast.update(toastId, { render: "Failed to set current video", type: "error", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: "Failed to set current video", type: "error", isLoading: false, autoClose: 1000 });
         return { success: false, message: result.message || "Set current failed." };
       }
     } catch (error) {
-      toast.update(toastId, { render: "Error setting current video", type: "error", isLoading: false, autoClose: 3000 });
+      toast.update(toastId, { render: "Error setting current video", type: "error", isLoading: false, autoClose: 1000 });
       return { success: false, message: error.message };
     }
   };
@@ -140,14 +140,14 @@ export default function VideoState(props) {
 
       if (result?.success) {
         setCurrentVideo(result.data);
-        //toast.update(toastId, { render: "Video updated", type: "success", isLoading: false, autoClose: 3000 });
+        //toast.update(toastId, { render: "Video updated", type: "success", isLoading: false, autoClose: 1000 });
         return { success: true, data: result.data };
       } else {
-        toast.update(toastId, { render: "Failed to update video", type: "error", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: "Failed to update video", type: "error", isLoading: false, autoClose: 1000 });
         return { success: false, message: result.message || "Update failed." };
       }
     } catch (error) {
-      toast.update(toastId, { render: "Error updating video", type: "error", isLoading: false, autoClose: 3000 });
+      toast.update(toastId, { render: "Error updating video", type: "error", isLoading: false, autoClose: 1000 });
       return { success: false, message: error.message };
     }
   };
@@ -176,12 +176,12 @@ export default function VideoState(props) {
       if (result?.success) {
         setVideos(result.data);
         toast.dismiss(toastId);
-        //toast.update(toastId, { render: "All videos loaded", type: "success", isLoading: false, autoClose: 3000 });
+        //toast.update(toastId, { render: "All videos loaded", type: "success", isLoading: false, autoClose: 1000 });
       } else {
-        toast.update(toastId, { render: "Failed to load all videos", type: "error", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: "Failed to load all videos", type: "error", isLoading: false, autoClose: 1000 });
       }
     } catch (error) {
-      toast.update(toastId, { render: "Error loading all videos", type: "error", isLoading: false, autoClose: 3000 });
+      toast.update(toastId, { render: "Error loading all videos", type: "error", isLoading: false, autoClose: 1000 });
     }
   };
 
@@ -209,12 +209,12 @@ export default function VideoState(props) {
       if (result?.success) {
         setCurrentVideo(result.data);
         toast.dismiss(toastId);
-        //toast.update(toastId, { render: "Current video loaded", type: "success", isLoading: false, autoClose: 3000 });
+        //toast.update(toastId, { render: "Current video loaded", type: "success", isLoading: false, autoClose: 1000 });
       } else {
-        toast.update(toastId, { render: "Failed to load current video", type: "error", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: "Failed to load current video", type: "error", isLoading: false, autoClose: 1000 });
       }
     } catch (error) {
-      toast.update(toastId, { render: "Error loading current video", type: "error", isLoading: false, autoClose: 3000 });
+      toast.update(toastId, { render: "Error loading current video", type: "error", isLoading: false, autoClose: 1000 });
     }
   };
 
@@ -245,14 +245,14 @@ export default function VideoState(props) {
       const result = await response.json();
 
       if (result?.success) {
-        toast.update(toastId, { render: "Video saved successfully", type: "success", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: "Video saved successfully", type: "success", isLoading: false, autoClose: 1000 });
         return { success: true, data: result.data };
       } else {
-        toast.update(toastId, { render: "Failed to save video", type: "error", isLoading: false, autoClose: 3000 });
+        toast.update(toastId, { render: "Failed to save video", type: "error", isLoading: false, autoClose: 1000 });
         return { success: false, message: result.message || "Save failed." };
       }
     } catch (error) {
-      toast.update(toastId, { render: "Error saving video", type: "error", isLoading: false, autoClose: 3000 });
+      toast.update(toastId, { render: "Error saving video", type: "error", isLoading: false, autoClose: 1000 });
       return { success: false, message: error.message };
     }
   };

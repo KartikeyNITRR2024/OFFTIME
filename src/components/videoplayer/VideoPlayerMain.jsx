@@ -57,17 +57,17 @@ const VideoPlayerMain = ({ trimmedCode }) => {
 
   return (
     <div className="w-full h-full">
-      <div className="h-16 flex justify-end items-center px-2 space-x-2 sm:space-x-4">
-        {/* <button
+      {/* <div className="h-16 flex justify-end items-center px-2 space-x-2 sm:space-x-4">
+        <button
           onClick={toggleDevices}
           className="w-1/4 sm:w-1/12 h-full bg-white text-sky-500 font-semibold px-4 sm:px-6 py-2 rounded-none hover:bg-sky-400 hover:text-white transition"
         >
           Slider
-        </button> */}
+        </button>
 
         {showDevices && (
           <>
-            {/* <button
+            <button
               onClick={() => handleDeviceSelect('mobile')}
               className={`w-1/4 sm:w-1/12 h-full px-4 sm:px-6 py-2 font-semibold rounded-none transition
                 ${selectedDevice === 'mobile'
@@ -86,10 +86,10 @@ const VideoPlayerMain = ({ trimmedCode }) => {
                 }`}
             >
               Desktop
-            </button> */}
+            </button>
           </>
         )}
-      </div>
+      </div> */}
 
       <div className="mt-4">
         {selectedDevice === 'mobile' && <MobileOption  trimmedCode={trimmedCode} setSelectedDevice={setSelectedDevice} />}

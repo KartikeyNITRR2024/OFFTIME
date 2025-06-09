@@ -158,7 +158,7 @@ const MobileOption = ({ trimmedCode }) => {
 
   return (
     <div className="max-w-md mx-auto p-4">
-      <h2 className="text-xl font-semibold mb-4">Dynamic Input Fields</h2>
+      <h2 className="text-xl font-semibold mb-4">Music Player</h2>
 
       {fields.map(({ id, value, videoName, isPlaying, isSaved }) => (
         <div

@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import VideoContext from '../../context/video/VideoContext';
-import UserContext from '../../context/user/UserContext';
+import WebSocketContext from '../../context/websocket/WebsocketContext';
+import WebsocketState from '../../context/websocket/WebsocketState';
+import WebSocket from '../../property/Websocket';
+import Microservices from '../../property/Microservices';
 
 const convertToEmbedUrl = (url) => {
   try {
@@ -14,8 +17,8 @@ const convertToEmbedUrl = (url) => {
 };
 
 const MobileOption = ({ trimmedCode }) => {
-  const { videos, deleteVideo, saveVideo, setCurrentVideofun } = useContext(VideoContext);
-  const { createOrUpdateCode } = useContext(UserContext);
+  const { videos, deleteVideo, saveVideo, setCurrentVideofun, getAllVideos } = useContext(VideoContext);
+  const { sendWork } = useContext(WebSocketContext);
 
   const [fields, setFields] = useState(() =>
     videos.length > 0
@@ -101,24 +104,40 @@ const MobileOption = ({ trimmedCode }) => {
             : field
         )
       );
-      await createOrUpdateCode(trimmedCode);
+      await getAllVideos(trimmedCode);
     } else {
       alert('Failed to save video: ' + (result.message || 'Unknown error'));
     }
   };
 
   const handlePlay = async (id) => {
-    const result = await setCurrentVideofun(trimmedCode, id);
-    if (result.success) {
-      setFields(prev =>
-        prev.map(field =>
-          field.id === id
-            ? { ...field, isPlaying: true }
-            : { ...field, isPlaying: false }
-        )
-      );
-    } else {
-      alert('Failed to play video: ' + (result.message || 'Unknown error'));
+    var result = null;
+    if(WebSocket.USING_WEBSOCKET)
+    {
+        const workDetail = {
+          pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+          workType: "VIDEO",
+          uniqueCode: trimmedCode,
+          workId: "SETCURRENTVIDEO",
+          payload: { id: id }
+        }
+        console.log("Sending work detail:", workDetail);
+        sendWork(workDetail);
+    }
+    else
+    {
+      result = await setCurrentVideofun(trimmedCode, id);
+      if (result.success) {
+        setFields(prev =>
+          prev.map(field =>
+            field.id === id
+              ? { ...field, isPlaying: true }
+              : { ...field, isPlaying: false }
+          )
+        );
+      } else {
+        alert('Failed to play video: ' + (result.message || 'Unknown error'));
+      }
     }
   };
 
@@ -131,7 +150,7 @@ const MobileOption = ({ trimmedCode }) => {
         alert('Failed to delete video: ' + (result.message || 'Unknown error'));
         return;
       }
-      await createOrUpdateCode(trimmedCode);
+      await getAllVideos(trimmedCode);
     }
 
     setFields(prev => prev.filter(field => field.id !== id));

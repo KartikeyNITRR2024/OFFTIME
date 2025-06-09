@@ -3,29 +3,33 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import VideoState from "./context/video/VideoState";
-import NotificationState from "./context/notification/NotificationState";
 import UserState from "./context/user/UserState";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import WebsocketState from "./context/websocket/WebsocketState";
 
 function App() {
-
   return (
-    <Routes>
-      <Route path="/" element={<Landing/>} />
-      <Route path="/:code" element={<Home />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/:code" element={<Home />} />
+      </Routes>
+      <ToastContainer position="top-right" autoClose={3000} />
+    </>
   );
 }
 
 export default function AppWrapper() {
   return (
-    <NotificationState>
+    <WebsocketState>
       <VideoState>
         <UserState>
           <BrowserRouter>
             <App />
           </BrowserRouter>
         </UserState>
-      </VideoState> 
-    </NotificationState>                         
+      </VideoState>
+    </WebsocketState>
   );
 }

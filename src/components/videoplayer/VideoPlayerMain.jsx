@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react';
 import MobileOption from './MobileOption';
 import DesktopOption from './DesktopOption';
+import VideoContext from '../../context/video/VideoContext';
 import UserContext from '../../context/user/UserContext';
+import WebSocketContext from '../../context/websocket/WebsocketContext';
+
 
 const VideoPlayerMain = ({ trimmedCode }) => {
   const [showDevices, setShowDevices] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null);
+  const { getCurrentVideo, getAllVideos } = useContext(VideoContext);
   const { createOrUpdateCode } = useContext(UserContext);
+  const { createConnection } = useContext(WebSocketContext);
 
 
   const isMobileDevice = () => window.innerWidth <= 768;
@@ -20,14 +25,8 @@ const VideoPlayerMain = ({ trimmedCode }) => {
         setSelectedDevice('desktop');
         setShowDevices(true);
       }
-
-      if (trimmedCode) {
-        try {
-          await createOrUpdateCode(trimmedCode);
-        } catch (error) {
-          console.error('Error during createOrUpdateCode:', error);
-        }
-      }
+      createOrUpdateCode(trimmedCode);
+      createConnection(trimmedCode);
     };
 
     init();
@@ -47,10 +46,11 @@ const VideoPlayerMain = ({ trimmedCode }) => {
 
   const handleDeviceSelect = async (device) => {
   setSelectedDevice(device);
-  try {
-    await createOrUpdateCode(trimmedCode);
-  } catch (error) {
-    console.error('Error during createOrUpdateCode:', error);
+  if(device === 'mobile') {
+    getAllVideos(trimmedCode);
+  }
+  else if(device === 'desktop') {
+    getCurrentVideo(trimmedCode);    
   }
 };
 

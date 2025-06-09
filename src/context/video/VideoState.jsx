@@ -1,12 +1,36 @@
-import React from "react";
+import React, {useEffect} from "react";
 import VideoContext from "./VideoContext";
 import { toast } from "react-toastify";
+import WebSocketContext from "../websocket/WebsocketContext";
 import Microservices from "../../property/Microservices";
+import WebSocket from "../../property/Websocket";
 
 export default function VideoState(props) {
 
   const [videos, setVideos] = React.useState([]);
   const [currentVideo, setCurrentVideo] = React.useState(null);
+  const { resultList, setResultList } = React.useContext(WebSocketContext);
+
+
+  useEffect(() => {
+  if (WebSocket.USING_WEBSOCKET && resultList.length > 0) {
+    const remainingResults = [];
+    var find = false;
+    for (const result of resultList) {
+      if (result?.workId === "SETCURRENTVIDEO") {
+        find = true;
+        setCurrentVideo(result.data);
+      } else {
+        remainingResults.push(result);
+      }
+    }
+    if(find) {
+      setResultList(remainingResults);
+    }
+
+  }
+}, [resultList]);
+
 
   const deleteVideo = async (code, id) => {
     const trimmed = code?.trim();
@@ -75,7 +99,8 @@ export default function VideoState(props) {
 
       if (result?.success) {
         setCurrentVideo(result.data);
-        toast.update(toastId, { render: "Current video set successfully", type: "success", isLoading: false, autoClose: 3000 });
+        toast.dismiss(toastId);
+        //toast.update(toastId, { render: "Current video set successfully", type: "success", isLoading: false, autoClose: 3000 });
         return { success: true, data: result.data };
       } else {
         toast.update(toastId, { render: "Failed to set current video", type: "error", isLoading: false, autoClose: 3000 });
@@ -115,7 +140,7 @@ export default function VideoState(props) {
 
       if (result?.success) {
         setCurrentVideo(result.data);
-        toast.update(toastId, { render: "Video updated", type: "success", isLoading: false, autoClose: 3000 });
+        //toast.update(toastId, { render: "Video updated", type: "success", isLoading: false, autoClose: 3000 });
         return { success: true, data: result.data };
       } else {
         toast.update(toastId, { render: "Failed to update video", type: "error", isLoading: false, autoClose: 3000 });
@@ -124,6 +149,72 @@ export default function VideoState(props) {
     } catch (error) {
       toast.update(toastId, { render: "Error updating video", type: "error", isLoading: false, autoClose: 3000 });
       return { success: false, message: error.message };
+    }
+  };
+
+  const getAllVideos = async (code) => {
+    const trimmed = code?.trim();
+    if (!trimmed || trimmed.length < 5 || trimmed.length > 10) {
+      return { success: false, message: "Code must be between 5 and 10 characters." };
+    }
+
+    const toastId = toast.loading("Loading videos...");
+
+    try {
+      const response = await fetch(
+        `${Microservices.OFFTIME_VIDEOPLAYER.URL}api/videos/${Microservices.OFFTIME_VIDEOPLAYER.ID}/${trimmed}/getAllVideos`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      if (result?.success) {
+        setVideos(result.data);
+        toast.dismiss(toastId);
+        //toast.update(toastId, { render: "All videos loaded", type: "success", isLoading: false, autoClose: 3000 });
+      } else {
+        toast.update(toastId, { render: "Failed to load all videos", type: "error", isLoading: false, autoClose: 3000 });
+      }
+    } catch (error) {
+      toast.update(toastId, { render: "Error loading all videos", type: "error", isLoading: false, autoClose: 3000 });
+    }
+  };
+
+  const getCurrentVideo = async (code) => {
+    const trimmed = code?.trim();
+    if (!trimmed || trimmed.length < 5 || trimmed.length > 10) {
+      return { success: false, message: "Code must be between 5 and 10 characters." };
+    }
+
+    const toastId = toast.loading("Loading current video...");
+
+    try {
+      const response = await fetch(
+        `${Microservices.OFFTIME_VIDEOPLAYER.URL}api/videos/${Microservices.OFFTIME_VIDEOPLAYER.ID}/${trimmed}/getCurrentVideo`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      if (result?.success) {
+        setCurrentVideo(result.data);
+        toast.dismiss(toastId);
+        //toast.update(toastId, { render: "Current video loaded", type: "success", isLoading: false, autoClose: 3000 });
+      } else {
+        toast.update(toastId, { render: "Failed to load current video", type: "error", isLoading: false, autoClose: 3000 });
+      }
+    } catch (error) {
+      toast.update(toastId, { render: "Error loading current video", type: "error", isLoading: false, autoClose: 3000 });
     }
   };
 
@@ -168,7 +259,7 @@ export default function VideoState(props) {
 
   return (
     <VideoContext.Provider
-      value={{ videos, setVideos, currentVideo, setCurrentVideo, deleteVideo, saveVideo, setCurrentVideofun, updateVideo }}
+      value={{ videos, setVideos, currentVideo, setCurrentVideo, deleteVideo, saveVideo, setCurrentVideofun, updateVideo, getAllVideos, getCurrentVideo }}
     >
       {props.children}
     </VideoContext.Provider>

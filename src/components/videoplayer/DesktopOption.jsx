@@ -2,10 +2,10 @@ import React, { useState, useContext } from 'react';
 import VideoContext from '../../context/video/VideoContext';
 import Loader from '../loader/Loader';
 
-const MobileOption = () => {
+const DesktopOption = () => {
   const [width, setWidth] = useState(560);
   const [height, setHeight] = useState(315);
-  const [audioOnly, setAudioOnly] = useState(false);
+  const [audioOnly, setAudioOnly] = useState(true);
   const { currentVideo } = useContext(VideoContext);
 
   if (!currentVideo) {
@@ -85,4 +85,4 @@ const MobileOption = () => {
   );
 };
 
-export default MobileOption;
+export default DesktopOption;

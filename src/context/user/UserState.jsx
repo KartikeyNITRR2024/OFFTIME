@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import UserContext from "./UserContext";
 import VideoContext from "../video/VideoContext";
 import Microservices from "../../property/Microservices";
-import WebSocket from "../../property/Websocket";
 
 export default function UserState(props) {
   const { setVideos, setCurrentVideo } = useContext(VideoContext);
@@ -12,7 +11,6 @@ export default function UserState(props) {
   const validateCode = async (code) => {
     const trimmed = code?.trim();
     if (!trimmed || trimmed.length < 5 || trimmed.length > 10) {
-      toast.error("Code must be between 5 and 10 characters.");
       return { isValid: false, message: "Code must be between 5 and 10 characters." };
     }
 
@@ -54,7 +52,8 @@ export default function UserState(props) {
         setLoading(false);
 
         if (result?.success) {
-          setVideos(result.data.videos || []);
+          const sortedVideos = result.data.videos.sort((a, b) => a.id - b.id);
+          setVideos(sortedVideos || []);
           setCurrentVideo(result.data.currentVideo || null);
           toast.dismiss(toastId);
           return { success: true };

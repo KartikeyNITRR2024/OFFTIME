@@ -10,6 +10,9 @@ export default function VideoState(props) {
   const [videos, setVideos] = React.useState([]);
   const [currentVideo, setCurrentVideo] = React.useState(null);
   const { resultList, setResultList } = React.useContext(WebSocketContext);
+  const [videoPaused, setVideoPaused] = React.useState(true);
+  const [playInLoop, setPlayInLoop] = React.useState(false);
+  const [muted, setMuted] = React.useState(false);
 
 
   useEffect(() => {
@@ -20,14 +23,26 @@ export default function VideoState(props) {
       if (result?.workId === "SETCURRENTVIDEO") {
         find = true;
         setCurrentVideo(result.data);
-      } else {
+      } 
+      if (result?.workId === "PLAY_PAUSE") {
+        find = true;
+        setVideoPaused(result.data);
+      }
+      if (result?.workId === "PLAYINLOOP") {
+        find = true;
+        setPlayInLoop(result.data);
+      }
+      if (result?.workId === "MUTEAUDIO") {
+        find = true;
+        setMuted(result.data);
+      }
+      if(find == false) {
         remainingResults.push(result);
       }
     }
     if(find) {
       setResultList(remainingResults);
     }
-
   }
 }, [resultList]);
 
@@ -122,7 +137,7 @@ export default function VideoState(props) {
       return { success: false, message: "Video ID is required." };
     }
 
-    const toastId = toast.loading("Updating video...");
+    //const toastId = toast.loading("Updating video...");
 
     try {
       const response = await fetch(
@@ -174,7 +189,8 @@ export default function VideoState(props) {
       const result = await response.json();
 
       if (result?.success) {
-        setVideos(result.data);
+        const sortedVideos = result.data.sort((a, b) => a.id - b.id);
+        setVideos(sortedVideos);
         toast.dismiss(toastId);
         //toast.update(toastId, { render: "All videos loaded", type: "success", isLoading: false, autoClose: 1000 });
       } else {
@@ -259,7 +275,7 @@ export default function VideoState(props) {
 
   return (
     <VideoContext.Provider
-      value={{ videos, setVideos, currentVideo, setCurrentVideo, deleteVideo, saveVideo, setCurrentVideofun, updateVideo, getAllVideos, getCurrentVideo }}
+      value={{ videos, setVideos, currentVideo, setCurrentVideo, deleteVideo, saveVideo, setCurrentVideofun, updateVideo, getAllVideos, getCurrentVideo, videoPaused, setVideoPaused, playInLoop, setPlayInLoop, muted, setMuted }}
     >
       {props.children}
     </VideoContext.Provider>

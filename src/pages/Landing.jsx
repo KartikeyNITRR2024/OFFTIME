@@ -1,8 +1,11 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import Header from '../components/header/Header';
 import Footer from '../components/footer/Footer';
-import { useNavigate } from 'react-router-dom'; 
-import UserContext from '../context/user/UserContext'; // adjust the path if needed
+import { useNavigate } from 'react-router-dom';
+import UserContext from '../context/user/UserContext';
+
+// React Icons
+import { FaArrowRight, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 
 const Landing = () => {
     const [code, setCode] = useState('');
@@ -20,15 +23,10 @@ const Landing = () => {
 
         if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
-
         debounceTimeout.current = setTimeout(async () => {
             if (value.trim() !== '') {
                 const result = await validateCode(value.trim());
-                if (!result.isValid) {
-                    setSuccess(false);
-                } else {
-                    setSuccess(true);
-                }
+                setSuccess(result.isValid);
                 setMessage(result.message);
             }
         }, 500);
@@ -66,29 +64,34 @@ const Landing = () => {
                                 onChange={handleChange}
                                 placeholder="Doreamon"
                                 className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                                    !success
+                                    success === false
                                         ? 'border-red-500 focus:ring-red-500'
-                                        : success
+                                        : success === true
                                         ? 'border-green-500 focus:ring-green-500'
                                         : 'border-gray-300 focus:ring-sky-500'
                                 }`}
                             />
-                            {success && (<button
-                                onClick={redirectPage}
-                                className="bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition"
-                            >
-                                Go!
-                            </button>)}
+                            {success && (
+                                <button
+                                    onClick={redirectPage}
+                                    className="bg-sky-600 text-white p-2 rounded-lg hover:bg-sky-700 transition"
+                                    title="Go"
+                                >
+                                    <FaArrowRight className="h-5 w-5" />
+                                </button>
+                            )}
                         </div>
-                        {success == false && (
+
+                        {success === false && (
                             <p className="mt-3 text-sm text-red-600 flex items-center">
-                                <img src="/assets/images/landingpage/allreadyused.png" alt="error" className="h-5 w-5 mr-2" />
+                                <FaTimesCircle className="h-4 w-4 mr-2" />
                                 {message}
                             </p>
                         )}
-                        {success && (
+
+                        {success === true && (
                             <p className="mt-3 text-sm text-green-600 flex items-center">
-                                <img src="/assets/images/landingpage/right.png" alt="success" className="h-5 w-5 mr-2" />
+                                <FaCheckCircle className="h-4 w-4 mr-2" />
                                 {message}
                             </p>
                         )}

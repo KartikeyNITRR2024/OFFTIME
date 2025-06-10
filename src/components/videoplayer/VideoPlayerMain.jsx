@@ -4,6 +4,8 @@ import DesktopOption from './DesktopOption';
 import VideoContext from '../../context/video/VideoContext';
 import UserContext from '../../context/user/UserContext';
 import WebSocketContext from '../../context/websocket/WebsocketContext';
+import DesktopOption2 from './DesktopOption2';
+import MobileOption2 from './MobileOption2';
 
 
 const VideoPlayerMain = ({ trimmedCode }) => {
@@ -92,8 +94,10 @@ const VideoPlayerMain = ({ trimmedCode }) => {
       </div> */}
 
       <div className="mt-4">
-        {selectedDevice === 'mobile' && <MobileOption  trimmedCode={trimmedCode} setSelectedDevice={setSelectedDevice} />}
-        {selectedDevice === 'desktop' && <DesktopOption  trimmedCode={trimmedCode}  />}
+        {/* {selectedDevice === 'mobile' && <MobileOption  trimmedCode={trimmedCode} setSelectedDevice={setSelectedDevice} />} */}
+        {selectedDevice === 'mobile' && <MobileOption2  trimmedCode={trimmedCode} setSelectedDevice={setSelectedDevice} />}
+        {/* {selectedDevice === 'desktop' && <DesktopOption  trimmedCode={trimmedCode}  />} */}
+        {selectedDevice === 'desktop' && <DesktopOption2  trimmedCode={trimmedCode}  />}
       </div>
     </div>
   );

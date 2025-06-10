@@ -117,10 +117,10 @@ const DesktopOption2 = ({ trimmedCode }) => {
         <button
           className="px-3 py-2 bg-sky-600 text-white rounded flex items-center gap-2"
           onClick={() => setVideoPaused(!videoPaused)}
-          title={videoPaused ? 'Play' : 'Pause'}
+          title={!videoPaused ? 'Play' : 'Pause'}
         >
-          {videoPaused ? <FaPlay /> : <FaPause />}
-          {videoPaused ? 'Play' : 'Pause'}
+          {!videoPaused ? <FaPlay /> : <FaPause />}
+          {!videoPaused ? 'Play' : 'Pause'}
         </button>
 
         {!audioOnly && (

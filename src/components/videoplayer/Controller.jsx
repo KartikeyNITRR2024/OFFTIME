@@ -69,6 +69,7 @@ function Controller({ trimmedCode }) {
 
 
   const handleNext = async () => {
+    setVideoPaused(!videoPaused);
     const currentVideoId = currentVideo.id;
     const nextVideo = videos.find(video => video.id > currentVideoId);
     var nextVideoId = videos[0].id;
@@ -76,9 +77,11 @@ function Controller({ trimmedCode }) {
       nextVideoId = nextVideo.id;
     }
     changeCurrentVideo(nextVideoId);
+    setVideoPaused(!videoPaused);
   };
 
   const handlePrevious = async () => {
+    setVideoPaused(!videoPaused);
     const currentVideoId = currentVideo.id;
     const previousVideo = [...videos].reverse().find(video => video.id < currentVideoId);
     var previousVideoId = videos[videos.length-1].id;
@@ -86,6 +89,7 @@ function Controller({ trimmedCode }) {
        previousVideoId = previousVideo.id;
     }
     changeCurrentVideo(previousVideoId);
+    setVideoPaused(!videoPaused);
   };
 
   const changeCurrentVideo = async (videoId) => {

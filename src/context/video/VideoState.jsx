@@ -19,6 +19,8 @@ export default function VideoState(props) {
   if (WebSocket.USING_WEBSOCKET && resultList.length > 0) {
     const remainingResults = [];
     var find = false;
+    const timeoutId = setTimeout(() => {
+    }, 300); 
     for (const result of resultList) {
       if (result?.workId === "SETCURRENTVIDEO") {
         find = true;

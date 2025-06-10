@@ -18,7 +18,7 @@ const convertToEmbedUrl = (url) => {
 };
 
 const MobileOption2 = ({ trimmedCode }) => {
-  const { videos, deleteVideo, saveVideo, setCurrentVideofun, getAllVideos, currentVideo } = useContext(VideoContext);
+  const { videos, deleteVideo, saveVideo, setCurrentVideofun, getAllVideos, currentVideo, videoPaused, setVideoPaused } = useContext(VideoContext);
   const { sendWork } = useContext(WebSocketContext);
 
   const [fields, setFields] = useState(() =>
@@ -40,6 +40,21 @@ const MobileOption2 = ({ trimmedCode }) => {
           isSaved: false,
         }]
   );
+
+  useEffect(() => {
+    if (WebSocket.USING_WEBSOCKET) {
+      const workDetail = {
+        pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+        workType: "VIDEO",
+        uniqueCode: trimmedCode,
+        workId: "PLAY_PAUSE",
+        payload: videoPaused
+      };
+      sendWork(workDetail);
+    } else {
+      alert("WebSocket is not using, please check your connection.");
+    }
+  }, [videoPaused]);
 
   useEffect(() => {
     if (videos.length > 0) {
@@ -113,6 +128,8 @@ const MobileOption2 = ({ trimmedCode }) => {
 
   const handlePlay = async (id) => {
     if (WebSocket.USING_WEBSOCKET) {
+      var videoPaused1 = videoPaused;
+      setVideoPaused(false);
       const workDetail = {
         pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
         workType: "VIDEO",
@@ -121,6 +138,7 @@ const MobileOption2 = ({ trimmedCode }) => {
         payload: { id: id }
       };
       sendWork(workDetail);
+      setVideoPaused(videoPaused1);
     } else {
       const result = await setCurrentVideofun(trimmedCode, id);
       if (result.success) {

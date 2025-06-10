@@ -169,6 +169,7 @@ const DesktopOption2 = ({ trimmedCode }) => {
 
       <div className="flex justify-center items-center flex-grow">
         <ReactPlayer
+          key={currentVideo?.id}
           ref={playerRef}
           url={currentVideo.videoUrl}
           playing={videoPaused}

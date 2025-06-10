@@ -66,7 +66,8 @@ const DesktopOption2 = ({ trimmedCode }) => {
 
 
   const songEndFunction = async () => {
-    setVideoPaused(!videoPaused);
+    var videoPaused1 = videoPaused;
+    setVideoPaused(false);
     const currentVideoId = currentVideo.id;
     await updateVideo(trimmedCode, currentVideoId, 0);
     const nextVideo = videos.find(video => video.id > currentVideoId);
@@ -75,7 +76,7 @@ const DesktopOption2 = ({ trimmedCode }) => {
       nextVideoId = nextVideo.id;
     }
     changeCurrentVideo(nextVideoId);
-    setVideoPaused(!videoPaused);
+    setVideoPaused(videoPaused);
   };
 
   const songStartFunction = async () => {

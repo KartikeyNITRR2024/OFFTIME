@@ -21,6 +21,7 @@ export default function WebsocketState(props) {
       webSocketFactory: () => new SockJS(`${Microservices.OFFTIME_VIDEOPLAYER.URL}ws`),
       onConnect: () => {
         stompClient.subscribe(`/queue/${trimmed}`, (workResult) => {
+          console.log("Received work result:", JSON.parse(workResult.body));
           resultList.push(JSON.parse(workResult.body));
           setResultList([...resultList]);
         });

@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import VideoContext from "./VideoContext";
 import { toast } from "react-toastify";
 import WebSocketContext from "../websocket/WebsocketContext";
@@ -15,7 +15,9 @@ export default function VideoState(props) {
   const [muted, setMuted] = React.useState(false);
 
 
- useEffect(() => {
+ const processedIdsRef = useRef(new Set());
+
+useEffect(() => {
   if (!WebSocket.USING_WEBSOCKET || resultList.length === 0) return;
 
   setResultList((prevList) => {
@@ -23,6 +25,11 @@ export default function VideoState(props) {
 
     for (const result of prevList) {
       let handled = false;
+      const key = `${result?.workId}:${result?.data?.id ?? JSON.stringify(result?.data)}`;
+
+      if (processedIdsRef.current.has(key)) {
+        continue;
+      }
 
       switch (result?.workId) {
         case "SETCURRENTVIDEO":
@@ -46,7 +53,9 @@ export default function VideoState(props) {
           handled = false;
       }
 
-      if (!handled) {
+      if (handled) {
+        processedIdsRef.current.add(key); // Mark as handled
+      } else {
         remainingResults.push(result);
       }
     }

@@ -16,36 +16,40 @@ export default function VideoState(props) {
 
 
   useEffect(() => {
-  if (WebSocket.USING_WEBSOCKET && resultList.length > 0) {
+  if (!WebSocket.USING_WEBSOCKET || resultList.length === 0) return;
+
+  setResultList((prevList) => {
     const remainingResults = [];
-    const timeoutId = setTimeout(() => {
-    }, 300); 
-    for (const result of resultList) {
-      var find = false;
+
+    for (const result of prevList) {
+      let handled = false;
+
       if (result?.workId === "SETCURRENTVIDEO") {
-        find = true;
+        handled = true;
         console.log("Setting current video:", result.data);
         setCurrentVideo(result.data);
       } 
-      if (result?.workId === "PLAY_PAUSE") {
-        find = true;
+      else if (result?.workId === "PLAY_PAUSE") {
+        handled = true;
         setVideoPaused(result.data);
-      }
-      if (result?.workId === "PLAYINLOOP") {
-        find = true;
+      } 
+      else if (result?.workId === "PLAYINLOOP") {
+        handled = true;
         setPlayInLoop(result.data);
-      }
-      if (result?.workId === "MUTEAUDIO") {
-        find = true;
+      } 
+      else if (result?.workId === "MUTEAUDIO") {
+        handled = true;
         setMuted(result.data);
       }
-      if(find == false) {
+
+      if (!handled) {
         remainingResults.push(result);
       }
     }
-    setResultList(remainingResults);
-  }
-}, [resultList]);
+
+    return remainingResults;
+  });
+}, [resultList, WebSocket.USING_WEBSOCKET]);
 
 
   const deleteVideo = async (code, id) => {

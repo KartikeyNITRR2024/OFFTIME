@@ -15,7 +15,7 @@ export default function VideoState(props) {
   const [muted, setMuted] = React.useState(false);
 
 
-  useEffect(() => {
+ useEffect(() => {
   if (!WebSocket.USING_WEBSOCKET || resultList.length === 0) return;
 
   setResultList((prevList) => {
@@ -24,22 +24,26 @@ export default function VideoState(props) {
     for (const result of prevList) {
       let handled = false;
 
-      if (result?.workId === "SETCURRENTVIDEO") {
-        handled = true;
-        console.log("Setting current video:", result.data);
-        setCurrentVideo(result.data);
-      } 
-      else if (result?.workId === "PLAY_PAUSE") {
-        handled = true;
-        setVideoPaused(result.data);
-      } 
-      else if (result?.workId === "PLAYINLOOP") {
-        handled = true;
-        setPlayInLoop(result.data);
-      } 
-      else if (result?.workId === "MUTEAUDIO") {
-        handled = true;
-        setMuted(result.data);
+      switch (result?.workId) {
+        case "SETCURRENTVIDEO":
+          console.log("Setting current video:", result.data);
+          setCurrentVideo(result.data);
+          handled = true;
+          break;
+        case "PLAY_PAUSE":
+          setVideoPaused(result.data);
+          handled = true;
+          break;
+        case "PLAYINLOOP":
+          setPlayInLoop(result.data);
+          handled = true;
+          break;
+        case "MUTEAUDIO":
+          setMuted(result.data);
+          handled = true;
+          break;
+        default:
+          handled = false;
       }
 
       if (!handled) {
@@ -47,9 +51,11 @@ export default function VideoState(props) {
       }
     }
 
+    console.log("Remaining unhandled results:", remainingResults);
     return remainingResults;
   });
 }, [resultList, WebSocket.USING_WEBSOCKET]);
+
 
 
   const deleteVideo = async (code, id) => {

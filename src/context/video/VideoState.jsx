@@ -25,7 +25,7 @@ useEffect(() => {
 
     for (const result of prevList) {
       let handled = false;
-      const key = `${result?.workId}:${result?.data?.id ?? JSON.stringify(result?.data)}`;
+      const key = `${result?.timestamp}`;
 
       if (processedIdsRef.current.has(key)) {
         continue;
@@ -54,7 +54,7 @@ useEffect(() => {
       }
 
       if (handled) {
-        processedIdsRef.current.add(key); // Mark as handled
+        processedIdsRef.current.add(key);
       } else {
         remainingResults.push(result);
       }

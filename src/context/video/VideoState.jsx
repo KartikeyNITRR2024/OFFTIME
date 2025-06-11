@@ -18,10 +18,10 @@ export default function VideoState(props) {
   useEffect(() => {
   if (WebSocket.USING_WEBSOCKET && resultList.length > 0) {
     const remainingResults = [];
-    var find = false;
     const timeoutId = setTimeout(() => {
     }, 300); 
     for (const result of resultList) {
+      var find = false;
       if (result?.workId === "SETCURRENTVIDEO") {
         find = true;
         setCurrentVideo(result.data);
@@ -42,9 +42,7 @@ export default function VideoState(props) {
         remainingResults.push(result);
       }
     }
-    if(find) {
-      setResultList(remainingResults);
-    }
+    setResultList(remainingResults);
   }
 }, [resultList]);
 

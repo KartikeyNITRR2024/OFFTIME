@@ -76,7 +76,7 @@ const DesktopOption2 = ({ trimmedCode }) => {
       nextVideoId = nextVideo.id;
     }
     changeCurrentVideo(nextVideoId);
-    setVideoPaused(videoPaused);
+    setVideoPaused(videoPaused1);
   };
 
   const songStartFunction = async () => {

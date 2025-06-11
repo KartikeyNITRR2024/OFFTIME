@@ -24,6 +24,7 @@ export default function VideoState(props) {
       var find = false;
       if (result?.workId === "SETCURRENTVIDEO") {
         find = true;
+        console.log("Setting current video:", result.data);
         setCurrentVideo(result.data);
       } 
       if (result?.workId === "PLAY_PAUSE") {

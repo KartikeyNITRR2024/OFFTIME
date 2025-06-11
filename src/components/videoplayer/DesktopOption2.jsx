@@ -31,7 +31,12 @@ const DesktopOption2 = ({ trimmedCode }) => {
   const [audioOnly, setAudioOnly] = useState(true);
   const [controls, setControls] = useState(true);
   const [volume, setVolume] = useState(0.8);
+  const [currentVideo1, setCurrentVideo1] = useState(null);
   const playerRef = useRef(null);
+
+  useEffect(() => {
+    setCurrentVideo1(currentVideo);
+  }, [currentVideo]);
 
   useEffect(() => {
     if (WebSocket.USING_WEBSOCKET) {
@@ -49,26 +54,26 @@ const DesktopOption2 = ({ trimmedCode }) => {
   }, [videoPaused]);
 
   useEffect(() => {
-  if (!currentVideo) return;
+  if (!currentVideo1) return;
 
   const interval = setInterval(() => {
     const sendUpdate = async () => {
       if (playerRef.current) {
         const currentTime = playerRef.current.getCurrentTime();
-        await updateVideo(trimmedCode, currentVideo.id, Math.floor(currentTime));
+        await updateVideo(trimmedCode, currentVideo1.id, Math.floor(currentTime));
       }
     };
     sendUpdate();
   }, 5000);
 
   return () => clearInterval(interval);
-}, [currentVideo, trimmedCode]);
+}, [currentVideo1, trimmedCode]);
 
 
   const songEndFunction = async () => {
     var videoPaused1 = videoPaused;
     setVideoPaused(false);
-    const currentVideoId = currentVideo.id;
+    const currentVideoId = currentVideo1.id;
     await updateVideo(trimmedCode, currentVideoId, 0);
     const nextVideo = videos.find(video => video.id > currentVideoId);
     var nextVideoId = videos[0].id;
@@ -80,8 +85,8 @@ const DesktopOption2 = ({ trimmedCode }) => {
   };
 
   const songStartFunction = async () => {
-    if (playerRef.current && currentVideo?.lastStopTime >= 0) {
-        playerRef.current.seekTo(currentVideo.lastStopTime, 'seconds');
+    if (playerRef.current && currentVideo1?.lastStopTime >= 0) {
+        playerRef.current.seekTo(currentVideo1.lastStopTime, 'seconds');
     }
   }
 
@@ -103,7 +108,7 @@ const DesktopOption2 = ({ trimmedCode }) => {
 
   const increment = 40;
 
-  if (!currentVideo) return <Loader />;
+  if (!currentVideo1) return <Loader />;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
@@ -169,9 +174,9 @@ const DesktopOption2 = ({ trimmedCode }) => {
 
       <div className="flex justify-center items-center flex-grow">
         <ReactPlayer
-          key={currentVideo?.id}
+          key={currentVideo1?.id}
           ref={playerRef}
-          url={currentVideo.videoUrl}
+          url={currentVideo1.videoUrl}
           playing={videoPaused}
           controls={controls}
           loop={playInLoop}

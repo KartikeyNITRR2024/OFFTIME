@@ -20,6 +20,7 @@ const convertToEmbedUrl = (url) => {
 const MobileOption2 = ({ trimmedCode }) => {
   const { videos, deleteVideo, saveVideo, setCurrentVideofun, getAllVideos, currentVideo, videoPaused, setVideoPaused } = useContext(VideoContext);
   const { sendWork } = useContext(WebSocketContext);
+  
 
   const [fields, setFields] = useState(() =>
     videos.length > 0

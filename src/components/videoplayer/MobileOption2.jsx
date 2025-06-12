@@ -5,6 +5,8 @@ import WebSocket from '../../property/Websocket';
 import Microservices from '../../property/Microservices';
 import Controller from './Controller';
 import { FaSave, FaTrash, FaPlus } from 'react-icons/fa';
+import SongPlayingIcon from './SongPlayingIcon';
+
 
 const convertToEmbedUrl = (url) => {
   try {
@@ -18,7 +20,7 @@ const convertToEmbedUrl = (url) => {
 };
 
 const MobileOption2 = ({ trimmedCode }) => {
-  const { videos, deleteVideo, saveVideo, setCurrentVideofun, getAllVideos, currentVideo, videoPaused, setVideoPaused } = useContext(VideoContext);
+  const { videos, deleteVideo, saveVideo, setCurrentVideofun, getAllVideos, currentVideo, videoPaused, lockPlayPauseButton, setLockPlayPauseButton } = useContext(VideoContext);
   const { sendWork } = useContext(WebSocketContext);
   
 
@@ -129,8 +131,8 @@ const MobileOption2 = ({ trimmedCode }) => {
 
   const handlePlay = async (id) => {
     if (WebSocket.USING_WEBSOCKET) {
-      var videoPaused1 = videoPaused;
-      setVideoPaused(false);
+      // var videoPaused1 = videoPaused;
+      // setVideoPaused(false);
       const workDetail = {
         pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
         workType: "VIDEO",
@@ -139,7 +141,7 @@ const MobileOption2 = ({ trimmedCode }) => {
         payload: { id: id }
       };
       sendWork(workDetail);
-      setVideoPaused(videoPaused1);
+      // setVideoPaused(videoPaused1);
     } else {
       const result = await setCurrentVideofun(trimmedCode, id);
       if (result.success) {
@@ -182,11 +184,14 @@ const MobileOption2 = ({ trimmedCode }) => {
                 <div
                   onClick={() => handlePlay(id)}
                   className={`w-5/8 px-3 py-2 truncate text-lg cursor-pointer rounded ${
-                    id===currentVideo.id ? 'underline' : ''
+                    currentVideo && id===currentVideo.id ? 'underline' : ''
                   }`}
                   title="Click to play"
                 >
-                  {videoName}
+                  <div className="flex items-center space-x-2">
+                    {currentVideo && id === currentVideo.id && <SongPlayingIcon/>}
+                    <span className="font-bold">{videoName}</span>
+                  </div>
                 </div>
 
                 <div className="w-3/8 flex justify-end space-x-2 mt-2 sm:mt-0">

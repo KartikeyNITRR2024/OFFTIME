@@ -1,69 +1,100 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect} from "react";
 import VideoContext from "./VideoContext";
 import { toast } from "react-toastify";
 import WebSocketContext from "../websocket/WebsocketContext";
 import Microservices from "../../property/Microservices";
 import WebSocket from "../../property/Websocket";
+import { startTransition } from 'react';
 
 export default function VideoState(props) {
 
   const [videos, setVideos] = React.useState([]);
   const [currentVideo, setCurrentVideo] = React.useState(null);
-  const { resultList, setResultList } = React.useContext(WebSocketContext);
+  const { result, setResult } = React.useContext(WebSocketContext);
   const [videoPaused, setVideoPaused] = React.useState(true);
   const [playInLoop, setPlayInLoop] = React.useState(false);
   const [muted, setMuted] = React.useState(false);
+  const [lockPlayPauseButton, setLockPlayPauseButton] = React.useState(false);
 
+// useEffect(() => {
+//   if (!WebSocket.USING_WEBSOCKET || resultList.length === 0) return;
 
- const processedIdsRef = useRef(new Set());
+//   setResultList((prevList) => {
+//     const remainingResults = [];
+
+//     for (const result of prevList) {
+//       let handled = false;
+//       const key = `${result?.timestamp}`;
+
+//       if (processedIdsRef.current.has(key)) {
+//         continue;
+//       }
+
+//       switch (result?.workId) {
+//         case "SETCURRENTVIDEO":
+//           setCurrentVideo(result.data);
+//           handled = true;
+//           break;
+//         case "PLAY_PAUSE":
+//           setVideoPaused(result.data);
+//           handled = true;
+//           break;
+//         case "PLAYINLOOP":
+//           setPlayInLoop(result.data);
+//           handled = true;
+//           break;
+//         case "MUTEAUDIO":
+//           setMuted(result.data);
+//           handled = true;
+//           break;
+//         default:
+//           handled = false;
+//       }
+
+//       if (handled) {
+//         processedIdsRef.current.add(key);
+//       } else {
+//         remainingResults.push(result);
+//       }
+//     }
+//     return remainingResults;
+//   });
+// }, [resultList, WebSocket.USING_WEBSOCKET]);
 
 useEffect(() => {
-  if (!WebSocket.USING_WEBSOCKET || resultList.length === 0) return;
+  if (!result) return;
 
-  setResultList((prevList) => {
-    const remainingResults = [];
+  const timeoutId = setTimeout(() => {
+    let handled = false;
 
-    for (const result of prevList) {
-      let handled = false;
-      const key = `${result?.timestamp}`;
-
-      if (processedIdsRef.current.has(key)) {
-        continue;
-      }
-
-      switch (result?.workId) {
-        case "SETCURRENTVIDEO":
-          console.log("Setting current video:", result.data);
-          setCurrentVideo(result.data);
-          handled = true;
-          break;
-        case "PLAY_PAUSE":
-          setVideoPaused(result.data);
-          handled = true;
-          break;
-        case "PLAYINLOOP":
-          setPlayInLoop(result.data);
-          handled = true;
-          break;
-        case "MUTEAUDIO":
-          setMuted(result.data);
-          handled = true;
-          break;
-        default:
-          handled = false;
-      }
-
-      if (handled) {
-        processedIdsRef.current.add(key);
-      } else {
-        remainingResults.push(result);
-      }
+    switch (result?.workId) {
+      case "SETCURRENTVIDEO":
+        startTransition(() => setCurrentVideo(result.data));
+        handled = true;
+        break;
+      case "PLAY_PAUSE":
+        startTransition(() => setLockPlayPauseButton(false));
+        startTransition(() => setVideoPaused(result.data));
+        handled = true;
+        break;
+      case "PLAYINLOOP":
+        startTransition(() => setPlayInLoop(result.data));
+        handled = true;
+        break;
+      case "MUTEAUDIO":
+        startTransition(() => setMuted(result.data));
+        handled = true;
+        break;
     }
 
-    console.log("Remaining unhandled results:", remainingResults);
-    return remainingResults;
-  });
-}, [resultList, WebSocket.USING_WEBSOCKET]);
+    if (!handled) {
+      setResult(null);
+    }
+
+    startTransition(() => setResult(null));
+  }, 0);
+  return () => clearTimeout(timeoutId);
+}, [result]);
 
 
 
@@ -174,7 +205,7 @@ useEffect(() => {
       const result = await response.json();
 
       if (result?.success) {
-        setCurrentVideo(result.data);
+        //setCurrentVideo(result.data);
         //toast.update(toastId, { render: "Video updated", type: "success", isLoading: false, autoClose: 1000 });
         return { success: true, data: result.data };
       } else {
@@ -295,7 +326,7 @@ useEffect(() => {
 
   return (
     <VideoContext.Provider
-      value={{ videos, setVideos, currentVideo, setCurrentVideo, deleteVideo, saveVideo, setCurrentVideofun, updateVideo, getAllVideos, getCurrentVideo, videoPaused, setVideoPaused, playInLoop, setPlayInLoop, muted, setMuted }}
+      value={{ videos, setVideos, currentVideo, setCurrentVideo, deleteVideo, saveVideo, setCurrentVideofun, updateVideo, getAllVideos, getCurrentVideo, videoPaused, setVideoPaused, playInLoop, setPlayInLoop, muted, setMuted, lockPlayPauseButton, setLockPlayPauseButton }}
     >
       {props.children}
     </VideoContext.Provider>

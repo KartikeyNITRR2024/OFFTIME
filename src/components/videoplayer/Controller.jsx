@@ -16,7 +16,7 @@ import WebSocketContext from '../../context/websocket/WebsocketContext';
 function Controller({ trimmedCode }) {
   const { currentVideo, videos } = useContext(VideoContext);
   const { sendWork } = useContext(WebSocketContext);
-  const { setCurrentVideofun, videoPaused, setVideoPaused, playInLoop, setPlayInLoop, muted, setMuted } = useContext(VideoContext);
+  const { setLockPlayPauseButton, setCurrentVideofun, videoPaused, setVideoPaused, playInLoop, setPlayInLoop, muted, setMuted, lockPlayPauseButton } = useContext(VideoContext);
 
   useEffect(() => {
     if (WebSocket.USING_WEBSOCKET) {
@@ -69,8 +69,8 @@ function Controller({ trimmedCode }) {
 
 
   const handleNext = async () => {
-    var videoPaused1 = videoPaused;
-    setVideoPaused(false);
+    // var videoPaused1 = videoPaused;
+    // setVideoPaused(false);
     const currentVideoId = currentVideo.id;
     const nextVideo = videos.find(video => video.id > currentVideoId);
     var nextVideoId = videos[0].id;
@@ -78,12 +78,12 @@ function Controller({ trimmedCode }) {
       nextVideoId = nextVideo.id;
     }
     changeCurrentVideo(nextVideoId);
-    setVideoPaused(videoPaused1);
+    // setVideoPaused(videoPaused1);
   };
 
   const handlePrevious = async () => {
-    var videoPaused1 = videoPaused;
-    setVideoPaused(false);
+    // var videoPaused1 = videoPaused;
+    // setVideoPaused(false);
     const currentVideoId = currentVideo.id;
     const previousVideo = [...videos].reverse().find(video => video.id < currentVideoId);
     var previousVideoId = videos[videos.length-1].id;
@@ -91,7 +91,7 @@ function Controller({ trimmedCode }) {
        previousVideoId = previousVideo.id;
     }
     changeCurrentVideo(previousVideoId);
-    setVideoPaused(videoPaused1);
+    // setVideoPaused(videoPaused1);
   };
 
   const changeCurrentVideo = async (videoId) => {
@@ -122,8 +122,15 @@ function Controller({ trimmedCode }) {
           </button>
         )}
 
-        <button onClick={() => setVideoPaused(!videoPaused)} title={videoPaused ? 'Pause' : 'Play'}>
-           {videoPaused ? <FaPause /> : <FaPlay />}
+        <button
+          onClick={() => {setLockPlayPauseButton(true);setVideoPaused(!videoPaused)}}
+          title={videoPaused ? 'Pause' : 'Play'}
+          disabled={lockPlayPauseButton}
+          className={`px-3 py-2 rounded flex items-center gap-2 ${
+            lockPlayPauseButton ? 'cursor-not-allowed' : 'bg-sky-600 text-white'
+          }`}
+        >
+          {videoPaused ? <FaPause /> : <FaPlay />}
         </button>
 
         {!playInLoop && (

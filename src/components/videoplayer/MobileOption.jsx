@@ -121,7 +121,6 @@ const MobileOption = ({ trimmedCode }) => {
           workId: "SETCURRENTVIDEO",
           payload: { id: id }
         }
-        console.log("Sending work detail:", workDetail);
         sendWork(workDetail);
     }
     else

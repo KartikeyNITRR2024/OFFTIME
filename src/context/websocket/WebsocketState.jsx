@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import WebsocketContext from "./WebsocketContext";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
@@ -8,7 +8,13 @@ import { toast } from "react-toastify";
 export default function WebsocketState(props) {
   const clientRef = useRef(null);
   const [connected, setConnected] = React.useState(false);
-  const [resultList, setResultList] = React.useState([]);
+  const [result, setResult] = React.useState();
+
+  // useEffect(() => {
+  //   console.log("Updated result list", result)
+  // }, [result]);
+
+
 
   const createConnection = (code) => {
     const trimmed = code?.trim();
@@ -21,9 +27,8 @@ export default function WebsocketState(props) {
       webSocketFactory: () => new SockJS(`${Microservices.OFFTIME_VIDEOPLAYER.URL}ws`),
       onConnect: () => {
         stompClient.subscribe(`/queue/${trimmed}`, (workResult) => {
-          console.log("Received work result:", JSON.parse(workResult.body));
-          resultList.push(JSON.parse(workResult.body));
-          setResultList([...resultList]);
+          //console.log("Received work result:", JSON.parse(workResult.body));
+          setResult(JSON.parse(workResult.body));
         });
         console.log("WebSocket connection established.");
         return { success: true, message: "Connection initiated." };
@@ -67,8 +72,8 @@ export default function WebsocketState(props) {
         closeConnection,
         sendWork,
         connected,
-        resultList,
-        setResultList
+        result,
+        setResult
       }}
     >
       {props.children}

@@ -14,7 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/:code" element={<Home />} />
-        <Route path="*" element={<Landing />} />
+        <Route path="/*" element={<Landing />} />
       </Routes>
       <ToastContainer position="top-right" autoClose={1000} />
     </>

@@ -73,24 +73,24 @@ const DesktopOption2 = ({ trimmedCode }) => {
 
 
   useEffect(() => {
-  let timeout;
+  // let timeout;
 
-  if (isBuffering) {
-    timeout = setTimeout(() => {
-      if (WebSocket.USING_WEBSOCKET && isBuffering) {
-        const workDetail = {
-          pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
-          workType: "VIDEO",
-          uniqueCode: trimmedCode,
-          workId: "ISBUFFERING",
-          payload: true
-        };
-        sendWork(workDetail);
-      }
-    }, 200);
-  }
+  // if (isBuffering) {
+  //   timeout = setTimeout(() => {
+  //     if (WebSocket.USING_WEBSOCKET && isBuffering) {
+  //       const workDetail = {
+  //         pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+  //         workType: "VIDEO",
+  //         uniqueCode: trimmedCode,
+  //         workId: "ISBUFFERING",
+  //         payload: true
+  //       };
+  //       sendWork(workDetail);
+  //     }
+  //   }, 200);
+  // }
 
-  return () => clearTimeout(timeout); 
+  // return () => clearTimeout(timeout); 
 }, [isBuffering]);
 
 

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   FaPlay,
   FaPause,
@@ -6,17 +6,30 @@ import {
   FaBackward,
   FaRedo,
   FaVolumeMute,
-  FaVolumeUp
+  FaVolumeUp,
+  FaExclamationCircle,
+  FaSpinner 
 } from 'react-icons/fa';
 import VideoContext from '../../context/video/VideoContext';
 import WebSocket from '../../property/Websocket';
 import Microservices from '../../property/Microservices';
 import WebSocketContext from '../../context/websocket/WebsocketContext';
+import {toast} from "react-toastify";
 
 function Controller({ trimmedCode }) {
   const { currentVideo, videos } = useContext(VideoContext);
-  const { sendWork } = useContext(WebSocketContext);
-  const { setLockPlayPauseButton, setCurrentVideofun, videoPaused, setVideoPaused, playInLoop, setPlayInLoop, muted, setMuted, lockPlayPauseButton } = useContext(VideoContext);
+  const { sendWork, isPlayerConnected } = useContext(WebSocketContext);
+  const { setLockPlayPauseButton, 
+          setCurrentVideofun, 
+          videoPaused, 
+          setVideoPaused, 
+          playInLoop, 
+          setPlayInLoop, 
+          muted, 
+          setMuted, 
+          lockPlayPauseButton,
+          isBuffering
+        } = useContext(VideoContext);
 
   useEffect(() => {
     if (WebSocket.USING_WEBSOCKET) {
@@ -122,16 +135,38 @@ function Controller({ trimmedCode }) {
           </button>
         )}
 
+       <div className="relative flex items-center gap-2">
         <button
-          onClick={() => {setLockPlayPauseButton(true);setVideoPaused(!videoPaused)}}
+          onClick={() => {
+            setLockPlayPauseButton(true);
+            setVideoPaused(!videoPaused);
+          }}
           title={videoPaused ? 'Pause' : 'Play'}
-          disabled={lockPlayPauseButton}
+          disabled={lockPlayPauseButton || !isPlayerConnected}
           className={`px-3 py-2 rounded flex items-center gap-2 ${
-            lockPlayPauseButton ? 'cursor-not-allowed' : 'bg-sky-600 text-white'
+            lockPlayPauseButton
+              ? 'cursor-not-allowed bg-gray-300 text-gray-500'
+              : 'bg-sky-600 text-white'
           }`}
         >
-          {videoPaused ? <FaPause /> : <FaPlay />}
+          {!isPlayerConnected ? (
+            <FaExclamationCircle
+              title="Player not found"
+              onClick={(e) => {
+                e.stopPropagation();
+                toast.error('❌ Player not found');
+              }}
+              className="text-white"
+            />
+          ) : isBuffering ? (
+            <FaSpinner className="animate-spin" title="Buffering..." />
+          ) : !videoPaused ? (
+            <FaPlay />
+          ) : (
+            <FaPause />
+          )}
         </button>
+      </div>
 
         {!playInLoop && (
           <button onClick={handleNext} title="Next">

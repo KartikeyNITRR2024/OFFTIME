@@ -1,50 +1,86 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import WebsocketContext from "./WebsocketContext";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import Microservices from "../../property/Microservices";
 import { toast } from "react-toastify";
 
+function useUpdateTimerCheck(updateTimerResult, setIsPlayerConnected) {
+  const updateTimerResultRef = useRef(null);
+
+  useEffect(() => {
+    updateTimerResultRef.current = updateTimerResult;
+  }, [updateTimerResult]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const latest = updateTimerResultRef.current;
+      if (latest) {
+        const now = new Date();
+        const refTime = new Date(latest);
+        const diffInSeconds = Math.abs((now - refTime) / 1000);
+
+        if (diffInSeconds < 6) {
+          setIsPlayerConnected(true);
+        } else {
+          setIsPlayerConnected(false);
+        }
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+}
+
 export default function WebsocketState(props) {
   const clientRef = useRef(null);
-  const [connected, setConnected] = React.useState(false);
-  const [result, setResult] = React.useState();
+  const [connected, setConnected] = useState(false);
+  const [result, setResult] = useState();
+  const [updateTimerResult, setUpdateTimerResult] = useState();
+  const [isPlayerConnected, setIsPlayerConnected] = useState(false);
 
-  // useEffect(() => {
-  //   console.log("Updated result list", result)
-  // }, [result]);
-
-
+  useUpdateTimerCheck(updateTimerResult, setIsPlayerConnected);
 
   const createConnection = (code) => {
     const trimmed = code?.trim();
     if (!trimmed || trimmed.length < 5 || trimmed.length > 10) {
       return { success: false, message: "Code must be between 5 and 10 characters." };
     }
+
     const toastId = toast.loading("Connecting to server...");
+
+    if (clientRef.current && clientRef.current.connected) {
+      console.log("Already connected.");
+      return;
+    }
 
     const stompClient = new Client({
       webSocketFactory: () => new SockJS(`${Microservices.OFFTIME_VIDEOPLAYER.URL}ws`),
       onConnect: () => {
         stompClient.subscribe(`/queue/${trimmed}`, (workResult) => {
-          //console.log("Received work result:", JSON.parse(workResult.body));
-          setResult(JSON.parse(workResult.body));
+          const result = JSON.parse(workResult.body);
+
+          if (result.workId === "ISPLAYING") {
+            const dateObject = new Date(result.timestamp);
+            setUpdateTimerResult(dateObject);
+          } else {
+            setResult(result);
+          }
         });
-        console.log("WebSocket connection established.");
-        return { success: true, message: "Connection initiated." };
+
+        console.log("✅ WebSocket connection established.");
+        toast.update(toastId, { render: "Connected to server", type: "success", isLoading: false, autoClose: 1000 });
+        setConnected(true);
       },
-      onStompError: (frame) => {
-        toast.update(toastId, { render: "Failed to connect with server", type: "error", isLoading: false, autoClose: 1000 });
+      onStompError: () => {
+        toast.update(toastId, { render: "❌ Failed to connect to server", type: "error", isLoading: false, autoClose: 1000 });
       },
       reconnectDelay: 5000,
     });
 
     stompClient.activate();
     clientRef.current = stompClient;
-    setConnected(true);
-    toast.dismiss(toastId);
   };
-
 
   const sendWork = (workDetail) => {
     if (clientRef.current && clientRef.current.connected) {
@@ -53,7 +89,7 @@ export default function WebsocketState(props) {
         body: JSON.stringify(workDetail),
       });
     } else {
-      console.warn("WebSocket not connected. Please establish connection first.");
+      console.warn("WebSocket not connected. Please connect first.");
     }
   };
 
@@ -61,7 +97,7 @@ export default function WebsocketState(props) {
     if (clientRef.current && clientRef.current.active) {
       clientRef.current.deactivate();
       clientRef.current = null;
-      console.log("WebSocket connection closed.");
+      console.log("🔌 WebSocket connection closed.");
     }
   };
 
@@ -73,7 +109,8 @@ export default function WebsocketState(props) {
         sendWork,
         connected,
         result,
-        setResult
+        setResult,
+        isPlayerConnected
       }}
     >
       {props.children}

@@ -13,11 +13,9 @@ const VideoPlayerMain = ({ trimmedCode }) => {
   const [selectedDevice, setSelectedDevice] = useState(null);
   const { getCurrentVideo, getAllVideos } = useContext(VideoContext);
   const { createOrUpdateCode } = useContext(UserContext);
-  const { createConnection } = useContext(WebSocketContext);
-
+  const { createConnection, closeConnection } = useContext(WebSocketContext);
 
   const isMobileDevice = () => window.innerWidth <= 768;
-
   useEffect(() => {
     const init = async () => {
       if (isMobileDevice()) {
@@ -38,7 +36,10 @@ const VideoPlayerMain = ({ trimmedCode }) => {
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      closeConnection();
+    }
   }, []);
 
   const toggleDevices = () => {

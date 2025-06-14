@@ -4,7 +4,7 @@ import WebSocketContext from '../../context/websocket/WebsocketContext';
 import WebSocket from '../../property/Websocket';
 import Microservices from '../../property/Microservices';
 import Controller from './Controller';
-import { FaSave, FaTrash, FaPlus } from 'react-icons/fa';
+import { FaSave, FaTrash, FaPlus, FaExclamationCircle } from 'react-icons/fa';
 import SongPlayingIcon from './SongPlayingIcon';
 
 
@@ -21,7 +21,7 @@ const convertToEmbedUrl = (url) => {
 
 const MobileOption2 = ({ trimmedCode }) => {
   const { videos, deleteVideo, saveVideo, setCurrentVideofun, getAllVideos, currentVideo, videoPaused, lockPlayPauseButton, setLockPlayPauseButton } = useContext(VideoContext);
-  const { sendWork } = useContext(WebSocketContext);
+  const { sendWork, isPlayerConnected } = useContext(WebSocketContext);
   
 
   const [fields, setFields] = useState(() =>
@@ -251,7 +251,14 @@ const MobileOption2 = ({ trimmedCode }) => {
         <FaPlus />
       </button>
       <div className="fixed bottom-0 left-0 w-full bg-sky-600/90 border-t shadow z-50">
-        <Controller trimmedCode={trimmedCode}/>
+        {isPlayerConnected ? (
+          <Controller trimmedCode={trimmedCode} />
+        ) : (
+          <div className="flex items-center justify-center gap-2 px-4 py-6 text-lg font-semibold">
+            <FaExclamationCircle className= "text-xl" title="Player not found" />
+            <span>Player not connected</span>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -23,7 +23,9 @@ const DesktopOption2 = ({ trimmedCode }) => {
     setCurrentVideofun,
     updateVideo,
     lockPlayPauseButton,
-    setLockPlayPauseButton
+    setLockPlayPauseButton,
+    isBuffering, 
+    setIsBuffering
   } = useContext(VideoContext);
 
   const { sendWork } = useContext(WebSocketContext);
@@ -31,8 +33,6 @@ const DesktopOption2 = ({ trimmedCode }) => {
   const [width, setWidth] = useState(560);
   const [height, setHeight] = useState(315);
   const [audioOnly, setAudioOnly] = useState(true);
-  const [controls, setControls] = useState(true);
-  const [volume, setVolume] = useState(0.8);
   const playerRef = useRef(null);            
 
   useEffect(() => {
@@ -51,13 +51,42 @@ const DesktopOption2 = ({ trimmedCode }) => {
   }, [videoPaused]);
 
   useEffect(() => {
+    if (WebSocket.USING_WEBSOCKET) {
+      const workDetail = {
+        pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+        workType: "VIDEO",
+        uniqueCode: trimmedCode,
+        workId: "ISBUFFERING",
+        payload: isBuffering
+      };
+      sendWork(workDetail);
+    } else {
+      alert("WebSocket is not using, please check your connection.");
+    }
+  }, [isBuffering]); 
+
+  useEffect(() => {
   if (!currentVideo) return;
 
   const interval = setInterval(() => {
     const sendUpdate = async () => {
       if (playerRef.current) {
         const currentTime = playerRef.current.getCurrentTime();
-        await updateVideo(trimmedCode, currentVideo.id, Math.floor(currentTime));
+        if (WebSocket.USING_WEBSOCKET) {
+          const workDetail = {
+            pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+            workType: "VIDEO",
+            uniqueCode: trimmedCode,
+            workId: "ISPLAYING",
+            payload: {
+              id: currentVideo.id,
+              lastStopTime: Math.floor(currentTime)
+            }
+          };
+          sendWork(workDetail);
+        } else {
+          await updateVideo(trimmedCode, currentVideo.id, Math.floor(currentTime));
+        }
       }
     };
     sendUpdate();
@@ -177,10 +206,12 @@ const DesktopOption2 = ({ trimmedCode }) => {
           ref={playerRef}
           url={currentVideo.videoUrl}
           playing={videoPaused}
-          controls={controls}
+          controls={true}
           loop={playInLoop}
-          volume={volume}
+          volume={1.0}
           muted={muted}
+          onBuffer={() => setIsBuffering(true)}
+          onBufferEnd={() => setIsBuffering(false)}
           width={audioOnly ? 0 : width}
           height={audioOnly ? 0 : height}
           style={audioOnly ? { visibility: 'hidden', position: 'absolute' } : {}}

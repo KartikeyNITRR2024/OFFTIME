@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef, useState, useContext} from "react";
 import VideoContext from "./VideoContext";
 import { toast } from "react-toastify";
 import WebSocketContext from "../websocket/WebsocketContext";
@@ -8,13 +8,14 @@ import { startTransition } from 'react';
 
 export default function VideoState(props) {
 
-  const [videos, setVideos] = React.useState([]);
-  const [currentVideo, setCurrentVideo] = React.useState(null);
-  const { result, setResult } = React.useContext(WebSocketContext);
-  const [videoPaused, setVideoPaused] = React.useState(true);
-  const [playInLoop, setPlayInLoop] = React.useState(false);
-  const [muted, setMuted] = React.useState(false);
-  const [lockPlayPauseButton, setLockPlayPauseButton] = React.useState(false);
+  const [videos, setVideos] = useState([]);
+  const [currentVideo, setCurrentVideo] = useState(null);
+  const { result, setResult, isPlayerConnected } = useContext(WebSocketContext);
+  const [videoPaused, setVideoPaused] = useState(true);
+  const [playInLoop, setPlayInLoop] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [lockPlayPauseButton, setLockPlayPauseButton] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
 
 // useEffect(() => {
 //   if (!WebSocket.USING_WEBSOCKET || resultList.length === 0) return;
@@ -61,6 +62,33 @@ export default function VideoState(props) {
 //   });
 // }, [resultList, WebSocket.USING_WEBSOCKET]);
 
+// useEffect(() => {
+//   const interval = setInterval(() => {
+//     console.log("console in interval 1", updateTimerResult.workId, "at", new Date().toLocaleTimeString());
+    
+//     if (updateTimerResult == null) {
+//       console.log("true");
+//       setVideoPaused(false);
+//       if (!videoPaused) {
+//         setVideoPaused(true);
+//       }
+//     } else {
+//       console.log("false");
+//       setUpdateTimerResult(null);
+//     }
+
+//   }, 7000);
+
+//   return () => clearInterval(interval);
+// }, []); // 👈 only run once
+
+
+
+
+useEffect(() => {
+   setVideoPaused(isPlayerConnected);
+}, [isPlayerConnected]);
+
 useEffect(() => {
   if (!result) return;
 
@@ -83,6 +111,11 @@ useEffect(() => {
         break;
       case "MUTEAUDIO":
         startTransition(() => setMuted(result.data));
+        handled = true;
+        break;
+      case "ISBUFFERING":
+        console.log("ISBUFFERING", result.data);
+        startTransition(() => setIsBuffering(result.data));
         handled = true;
         break;
     }
@@ -326,7 +359,27 @@ useEffect(() => {
 
   return (
     <VideoContext.Provider
-      value={{ videos, setVideos, currentVideo, setCurrentVideo, deleteVideo, saveVideo, setCurrentVideofun, updateVideo, getAllVideos, getCurrentVideo, videoPaused, setVideoPaused, playInLoop, setPlayInLoop, muted, setMuted, lockPlayPauseButton, setLockPlayPauseButton }}
+      value={{ 
+        videos, 
+        setVideos, 
+        currentVideo, 
+        setCurrentVideo, 
+        deleteVideo, 
+        saveVideo, 
+        setCurrentVideofun, 
+        updateVideo, 
+        getAllVideos, 
+        getCurrentVideo, 
+        videoPaused, 
+        setVideoPaused, 
+        playInLoop, 
+        setPlayInLoop, 
+        muted, 
+        setMuted, 
+        lockPlayPauseButton, 
+        setLockPlayPauseButton, 
+        isBuffering, 
+        setIsBuffering }}
     >
       {props.children}
     </VideoContext.Provider>

@@ -240,7 +240,7 @@ const DesktopOption2 = ({ trimmedCode }) => {
           loop={playInLoop}
           volume={1.0}
           muted={muted}
-          onBuffer={() => setIsBuffering(true)}
+          onBuffer={() => setIsBuffering(false)}
           onBufferEnd={() => setIsBuffering(false)}
           width={audioOnly ? 0 : width}
           height={audioOnly ? 0 : height}

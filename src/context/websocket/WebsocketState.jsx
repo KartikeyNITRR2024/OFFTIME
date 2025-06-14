@@ -19,7 +19,7 @@ function useUpdateTimerCheck(updateTimerResult, setIsPlayerConnected) {
         const now = new Date();
         const refTime = new Date(latest);
         const diffInSeconds = Math.abs((now - refTime) / 1000);
-        console.log("hello 2", refTime," ",refTime);
+        console.log("hello 2", refTime," ",now+" "+diffInSeconds);
         if (diffInSeconds < 6) {
           console.log("hello 3 less then 6");
           setIsPlayerConnected(true);

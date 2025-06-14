@@ -31,8 +31,26 @@ function Controller({ trimmedCode }) {
           isBuffering
         } = useContext(VideoContext);
 
+  // useEffect(() => {
+  //   if (WebSocket.USING_WEBSOCKET) {
+  //     const workDetail = {
+  //       pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+  //       workType: "VIDEO",
+  //       uniqueCode: trimmedCode,
+  //       workId: "PLAY_PAUSE",
+  //       payload: videoPaused
+  //     };
+  //     sendWork(workDetail);
+  //   } else {
+  //     alert("WebSocket is not using, please check your connection.");
+  //   }
+  // }, [videoPaused]);
+
   useEffect(() => {
-    if (WebSocket.USING_WEBSOCKET) {
+  let timeout;
+
+  if (WebSocket.USING_WEBSOCKET) {
+    timeout = setTimeout(() => {
       const workDetail = {
         pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
         workType: "VIDEO",
@@ -41,10 +59,13 @@ function Controller({ trimmedCode }) {
         payload: videoPaused
       };
       sendWork(workDetail);
-    } else {
-      alert("WebSocket is not using, please check your connection.");
-    }
-  }, [videoPaused]);
+    }, 1500); 
+  } else {
+    alert("WebSocket is not using, please check your connection.");
+  }
+
+  return () => clearTimeout(timeout);
+}, [videoPaused]);
 
   useEffect(() => {
     if (WebSocket.USING_WEBSOCKET) {

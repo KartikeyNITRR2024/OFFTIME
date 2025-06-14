@@ -1,88 +1,255 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import VideoContext from '../../context/video/VideoContext';
 import Loader from '../loader/Loader';
+import ReactPlayer from 'react-player/youtube';
+import {
+  FaHeadphones, FaVideo,
+  FaPlay, FaPause,
+  FaExpandArrowsAlt, FaCompressArrowsAlt,
+  FaArrowUp, FaArrowDown,
+} from 'react-icons/fa';
+import WebSocket from '../../property/Websocket';
+import Microservices from '../../property/Microservices';
+import WebSocketContext from '../../context/websocket/WebsocketContext';
 
-const DesktopOption = () => {
+const DesktopOption2 = ({ trimmedCode }) => {
+  const {
+    currentVideo,
+    videoPaused,
+    setVideoPaused,
+    playInLoop,
+    muted,
+    videos,
+    setCurrentVideofun,
+    updateVideo,
+    lockPlayPauseButton,
+    setLockPlayPauseButton,
+    isBuffering, 
+    setIsBuffering
+  } = useContext(VideoContext);
+
+  const { sendWork } = useContext(WebSocketContext);
+
   const [width, setWidth] = useState(560);
   const [height, setHeight] = useState(315);
   const [audioOnly, setAudioOnly] = useState(true);
-  const { currentVideo } = useContext(VideoContext);
+  const playerRef = useRef(null);            
 
-  if (!currentVideo) {
-    return <Loader />;
+  // useEffect(() => {
+  //   if (WebSocket.USING_WEBSOCKET) {
+  //     const workDetail = {
+  //       pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+  //       workType: "VIDEO",
+  //       uniqueCode: trimmedCode,
+  //       workId: "PLAY_PAUSE",
+  //       payload: videoPaused
+  //     };
+  //     sendWork(workDetail);
+  //   } else {
+  //     alert("WebSocket is not using, please check your connection.");
+  //   }
+  // }, [videoPaused]);
+
+  useEffect(() => {
+  let timeout;
+
+  if (WebSocket.USING_WEBSOCKET) {
+    timeout = setTimeout(() => {
+      const workDetail = {
+        pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+        workType: "VIDEO",
+        uniqueCode: trimmedCode,
+        workId: "PLAY_PAUSE",
+        payload: videoPaused
+      };
+      sendWork(workDetail);
+    }, 1500);
+  } else {
+    alert("WebSocket is not using, please check your connection.");
+  }
+
+  return () => clearTimeout(timeout);
+}, [videoPaused]);
+
+
+  useEffect(() => {
+  let timeout;
+
+  if (isBuffering) {
+    timeout = setTimeout(() => {
+      if (WebSocket.USING_WEBSOCKET && isBuffering) {
+        const workDetail = {
+          pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+          workType: "VIDEO",
+          uniqueCode: trimmedCode,
+          workId: "ISBUFFERING",
+          payload: true
+        };
+        sendWork(workDetail);
+      }
+    }, 1500);
+  }
+
+  return () => clearTimeout(timeout); 
+}, [isBuffering]);
+
+
+  useEffect(() => {
+  if (!currentVideo) return;
+
+  const interval = setInterval(() => {
+    const sendUpdate = async () => {
+      if (playerRef.current) {
+        const currentTime = playerRef.current.getCurrentTime();
+        if (WebSocket.USING_WEBSOCKET) {
+          const workDetail = {
+            pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+            workType: "VIDEO",
+            uniqueCode: trimmedCode,
+            workId: "ISPLAYING",
+            payload: {
+              id: currentVideo.id,
+              lastStopTime: Math.floor(currentTime)
+            }
+          };
+          sendWork(workDetail);
+        } else {
+          await updateVideo(trimmedCode, currentVideo.id, Math.floor(currentTime));
+        }
+      }
+    };
+    sendUpdate();
+  }, 5000);
+
+  return () => clearInterval(interval);
+}, [currentVideo, trimmedCode]);
+
+
+  const songEndFunction = async () => {
+    // var videoPaused1 = videoPaused;
+    // setVideoPaused(false);
+    const currentVideoId = currentVideo.id;
+    await updateVideo(trimmedCode, currentVideoId, 0);
+    const nextVideo = videos.find(video => video.id > currentVideoId);
+    var nextVideoId = videos[0].id;
+    if (nextVideo) {
+      nextVideoId = nextVideo.id;
+    }
+    changeCurrentVideo(nextVideoId);
+    // setVideoPaused(videoPaused1);
+  };
+
+  const songStartFunction = async () => {
+    if (playerRef.current && currentVideo?.lastStopTime >= 0) {
+        playerRef.current.seekTo(currentVideo.lastStopTime, 'seconds');
+    }
   }
 
 
+  const changeCurrentVideo = async (videoId) => {
+    if (WebSocket.USING_WEBSOCKET) {
+      const workDetail = {
+        pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+        workType: "VIDEO",
+        uniqueCode: trimmedCode,
+        workId: "SETCURRENTVIDEO",
+        payload: { id: videoId }
+      };
+      sendWork(workDetail);
+    } else {
+      await setCurrentVideofun(trimmedCode, videoId);
+    }
+  };
 
-  const increaseWidth = () => setWidth((w) => Math.min(w + 50, 1000));
-  const decreaseWidth = () => setWidth((w) => Math.max(w - 50, 100));
-  const increaseHeight = () => setHeight((h) => Math.min(h + 30, 800));
-  const decreaseHeight = () => setHeight((h) => Math.max(h - 30, 100));
-  const toggleAudioOnly = () => setAudioOnly((prev) => !prev);
+  const increment = 40;
+
+  if (!currentVideo) return <Loader />;
 
   return (
-    <div className="flex flex-row items-center justify-center min-h-screen p-4">
-      <div className="flex justify-center items-center flex-grow">
-        <iframe
-          width={audioOnly ? 1 : width}
-          height={audioOnly ? 1 : height}
-          style={{
-            opacity: audioOnly ? 0 : 1,
-            transition: 'opacity 0.3s',
-            pointerEvents: audioOnly ? 'none' : 'auto',
-          }}
-          src={`${currentVideo.videoUrl}?start=${currentVideo.lastStopTime}&autoplay=1`}
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
-      </div>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
+      <div className="flex flex-wrap gap-2 justify-center">
+        <button
+          className="px-3 py-2 bg-sky-600 text-white rounded flex items-center gap-2"
+          onClick={() => setAudioOnly(!audioOnly)}
+          title={audioOnly ? 'Switch to Video Mode' : 'Switch to Audio Only'}
+        >
+          {audioOnly ? <FaVideo /> : <FaHeadphones />}
+          {audioOnly ? 'Video Mode' : 'Audio Only'}
+        </button>
 
-      {/* Control Buttons on Right */}
-      <div className="flex flex-col items-end space-y-2 ml-4">
+        <button
+          className={`px-3 py-2 text-white rounded flex items-center gap-2 
+            ${lockPlayPauseButton ? 'cursor-not-allowed' : 'bg-sky-600 hover:bg-sky-700'}`}
+          onClick={() => { setLockPlayPauseButton(true);setVideoPaused(!videoPaused)}}
+          title={!videoPaused ? 'Play' : 'Pause'}
+          disabled={lockPlayPauseButton}
+        >
+          {!videoPaused ? <FaPlay /> : <FaPause />}
+          {!videoPaused ? 'Play' : 'Pause'}
+        </button>
+
         {!audioOnly && (
           <>
             <button
-              onClick={decreaseWidth}
-              className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-              title="Decrease Width"
-            >
-              ➖↔️
-            </button>
-            <button
-              onClick={increaseWidth}
-              className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-3 py-2 bg-sky-600 text-white rounded flex items-center gap-2"
+              onClick={() => setWidth(width + increment)}
               title="Increase Width"
             >
-              ➕↔️
+              <FaExpandArrowsAlt />
+              Width +
             </button>
+
             <button
-              onClick={decreaseHeight}
-              className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-              title="Decrease Height"
+              className="px-3 py-2 bg-sky-600 text-white rounded flex items-center gap-2"
+              onClick={() => setWidth(Math.max(100, width - increment))}
+              title="Decrease Width"
             >
-              ➖↕️
+              <FaCompressArrowsAlt />
+              Width -
             </button>
+
             <button
-              onClick={increaseHeight}
-              className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+              className="px-3 py-2 bg-sky-600 text-white rounded flex items-center gap-2"
+              onClick={() => setHeight(height + increment)}
               title="Increase Height"
             >
-              ➕↕️
+              <FaArrowUp />
+              Height +
+            </button>
+
+            <button
+              className="px-3 py-2 bg-sky-600 text-white rounded flex items-center gap-2"
+              onClick={() => setHeight(Math.max(100, height - increment))}
+              title="Decrease Height"
+            >
+              <FaArrowDown />
+              Height -
             </button>
           </>
         )}
-        <button
-          onClick={toggleAudioOnly}
-          className="text-xs px-2 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700"
-          title="Toggle Audio/Video"
-        >
-          {audioOnly ? '🎥' : '🎧'}
-        </button>
+      </div>
+
+      <div className="flex justify-center items-center flex-grow">
+        <ReactPlayer
+          key={currentVideo?.id}
+          ref={playerRef}
+          url={currentVideo.videoUrl}
+          playing={videoPaused}
+          controls={true}
+          loop={playInLoop}
+          volume={1.0}
+          muted={muted}
+          onBuffer={() => setIsBuffering(true)}
+          onBufferEnd={() => setIsBuffering(false)}
+          width={audioOnly ? 0 : width}
+          height={audioOnly ? 0 : height}
+          style={audioOnly ? { visibility: 'hidden', position: 'absolute' } : {}}
+          onEnded={songEndFunction}
+          onReady={songStartFunction}
+        />
       </div>
     </div>
   );
 };
 
-export default DesktopOption;
+export default DesktopOption2;

@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import VideoContext from '../../context/video/VideoContext';
 import WebSocketContext from '../../context/websocket/WebsocketContext';
-import WebsocketState from '../../context/websocket/WebsocketState';
 import WebSocket from '../../property/Websocket';
 import Microservices from '../../property/Microservices';
+import Controller from './Controller';
+import { FaSave, FaTrash, FaPlus, FaExclamationCircle } from 'react-icons/fa';
+import SongPlayingIcon from './SongPlayingIcon';
+
 
 const convertToEmbedUrl = (url) => {
   try {
@@ -16,9 +19,10 @@ const convertToEmbedUrl = (url) => {
   }
 };
 
-const MobileOption = ({ trimmedCode }) => {
-  const { videos, deleteVideo, saveVideo, setCurrentVideofun, getAllVideos } = useContext(VideoContext);
-  const { sendWork } = useContext(WebSocketContext);
+const MobileOption2 = ({ trimmedCode }) => {
+  const { videos, deleteVideo, saveVideo, setCurrentVideofun, getAllVideos, currentVideo, videoPaused, lockPlayPauseButton, setLockPlayPauseButton } = useContext(VideoContext);
+  const { sendWork, isPlayerConnected } = useContext(WebSocketContext);
+  
 
   const [fields, setFields] = useState(() =>
     videos.length > 0
@@ -39,6 +43,21 @@ const MobileOption = ({ trimmedCode }) => {
           isSaved: false,
         }]
   );
+
+  useEffect(() => {
+    if (WebSocket.USING_WEBSOCKET) {
+      const workDetail = {
+        pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+        workType: "VIDEO",
+        uniqueCode: trimmedCode,
+        workId: "PLAY_PAUSE",
+        payload: videoPaused
+      };
+      sendWork(workDetail);
+    } else {
+      alert("WebSocket is not using, please check your connection.");
+    }
+  }, [videoPaused]);
 
   useEffect(() => {
     if (videos.length > 0) {
@@ -111,21 +130,20 @@ const MobileOption = ({ trimmedCode }) => {
   };
 
   const handlePlay = async (id) => {
-    var result = null;
-    if(WebSocket.USING_WEBSOCKET)
-    {
-        const workDetail = {
-          pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
-          workType: "VIDEO",
-          uniqueCode: trimmedCode,
-          workId: "SETCURRENTVIDEO",
-          payload: { id: id }
-        }
-        sendWork(workDetail);
-    }
-    else
-    {
-      result = await setCurrentVideofun(trimmedCode, id);
+    if (WebSocket.USING_WEBSOCKET) {
+      // var videoPaused1 = videoPaused;
+      // setVideoPaused(false);
+      const workDetail = {
+        pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+        workType: "VIDEO",
+        uniqueCode: trimmedCode,
+        workId: "SETCURRENTVIDEO",
+        payload: { id: id }
+      };
+      sendWork(workDetail);
+      // setVideoPaused(videoPaused1);
+    } else {
+      const result = await setCurrentVideofun(trimmedCode, id);
       if (result.success) {
         setFields(prev =>
           prev.map(field =>
@@ -157,71 +175,93 @@ const MobileOption = ({ trimmedCode }) => {
 
   return (
     <div className="max-w-md mx-auto p-4">
-      <h2 className="text-xl font-semibold mb-4">Music Player</h2>
-
-      {fields.map(({ id, value, videoName, isPlaying, isSaved }) => (
-        <div
-          key={id}
-          className="flex flex-col sm:flex-row items-start sm:items-center mb-3 space-y-2 sm:space-y-0 sm:space-x-2"
-        >
-          <input
-            type="text"
-            value={videoName}
-            onChange={e => handleChange(id, 'videoName', e.target.value)}
-            placeholder="Video name"
-            disabled={isSaved}
-            className="w-full sm:w-1/3 border rounded px-3 py-2 disabled:bg-gray-200"
-          />
-          <input
-            type="text"
-            value={value}
-            onChange={e => handleChange(id, 'value', e.target.value)}
-            placeholder="Video URL"
-            disabled={isSaved}
-            className="w-full sm:w-2/3 border rounded px-3 py-2 disabled:bg-gray-200"
-          />
-
-          <div className="flex space-x-1 items-center">
+      {fields.map(({ id, value, videoName, isPlaying, isSaved }, index) => (
+        <div key={id} className="mb-3">
+          <div className="flex flex-col sm:flex-row items-center">
             {isSaved ? (
               <>
-                <button
+                <div className="flex w-full space-x-2">
+                <div
                   onClick={() => handlePlay(id)}
-                  className={`px-3 py-2 rounded text-white ${
-                    isPlaying ? 'bg-green-600' : 'bg-gray-600 hover:bg-green-600'
+                  className={`w-5/8 px-3 py-2 truncate text-lg cursor-pointer rounded ${
+                    currentVideo && id===currentVideo.id ? 'underline' : ''
                   }`}
-                  title="Play"
+                  title="Click to play"
                 >
-                  ▶️
-                </button>
+                  <div className="flex items-center space-x-2">
+                    {currentVideo && id === currentVideo.id && <SongPlayingIcon/>}
+                    <span className="font-bold">{videoName}</span>
+                  </div>
+                </div>
+
+                <div className="w-3/8 flex justify-end space-x-2 mt-2 sm:mt-0">
+                  <button
+                    onClick={() => handleDelete(id)}
+                    className="px-3 py-2 rounded text-white bg-sky-600 hover:bg-sky-600/80"
+                    title="Delete"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+                </div>
               </>
             ) : (
-              <button
-                onClick={() => handleSave(id)}
-                className="px-3 py-2 rounded text-white bg-blue-600 hover:bg-blue-700"
-                title="Save"
-              >
-                💾
-              </button>
+              <>
+                <input
+                  type="text"
+                  value={videoName}
+                  onChange={e => handleChange(id, 'videoName', e.target.value)}
+                  placeholder="Video name"
+                  className="w-full border rounded px-3 py-2 mb-2"
+                />
+                <input
+                  type="text"
+                  value={value}
+                  onChange={e => handleChange(id, 'value', e.target.value)}
+                  placeholder="Video URL"
+                  className="w-full border rounded px-3 py-2 mb-2"
+                />
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => handleSave(id)}
+                    className="px-3 py-2 rounded text-white bg-sky-600/90 hover:bg-sky-600/80"
+                    title="Save"
+                  >
+                    <FaSave />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(id)}
+                    className="px-3 py-2 rounded text-white bg-sky-600/90 hover:bg-sky-600/80"
+                    title="Delete"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              </>
             )}
-            <button
-              onClick={() => handleDelete(id)}
-              className="px-3 py-2 rounded text-white bg-red-700 hover:bg-red-800"
-              title="Delete"
-            >
-              🗑️
-            </button>
           </div>
+          {index < fields.length - 1 && <hr className="my-3 bg-sky-600/90" />}
         </div>
       ))}
 
       <button
         onClick={addField}
-        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        className="mt-4 px-4 py-2 text-white rounded bg-sky-600 hover:bg-sky-600/80"
       >
-        + Add Song
+        <FaPlus />
       </button>
+      <div className="fixed bottom-0 left-0 w-full bg-sky-600/90 border-t shadow z-50">
+        {isPlayerConnected ? (
+          <Controller trimmedCode={trimmedCode} />
+        ) : (
+          <div className="flex items-center justify-center gap-2 px-4 py-6 text-lg font-semibold">
+            <FaExclamationCircle className= "text-xl" title="Player not found" />
+            <span>Player not connected</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default MobileOption;
+export default MobileOption2;

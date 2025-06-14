@@ -25,7 +25,7 @@ function useUpdateTimerCheck(updateTimerResult, setIsPlayerConnected) {
           setIsPlayerConnected(false);
         }
       }
-    }, 3000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, []);

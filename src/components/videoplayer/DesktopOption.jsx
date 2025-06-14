@@ -87,7 +87,7 @@ const DesktopOption2 = ({ trimmedCode }) => {
         };
         sendWork(workDetail);
       }
-    }, 1500);
+    }, 200);
   }
 
   return () => clearTimeout(timeout); 

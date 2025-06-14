@@ -86,6 +86,7 @@ export default function VideoState(props) {
 
 
 useEffect(() => {
+   console.log("hello 4");
    setVideoPaused(isPlayerConnected);
 }, [isPlayerConnected]);
 

@@ -17,76 +17,10 @@ export default function VideoState(props) {
   const [lockPlayPauseButton, setLockPlayPauseButton] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
 
-// useEffect(() => {
-//   if (!WebSocket.USING_WEBSOCKET || resultList.length === 0) return;
-
-//   setResultList((prevList) => {
-//     const remainingResults = [];
-
-//     for (const result of prevList) {
-//       let handled = false;
-//       const key = `${result?.timestamp}`;
-
-//       if (processedIdsRef.current.has(key)) {
-//         continue;
-//       }
-
-//       switch (result?.workId) {
-//         case "SETCURRENTVIDEO":
-//           setCurrentVideo(result.data);
-//           handled = true;
-//           break;
-//         case "PLAY_PAUSE":
-//           setVideoPaused(result.data);
-//           handled = true;
-//           break;
-//         case "PLAYINLOOP":
-//           setPlayInLoop(result.data);
-//           handled = true;
-//           break;
-//         case "MUTEAUDIO":
-//           setMuted(result.data);
-//           handled = true;
-//           break;
-//         default:
-//           handled = false;
-//       }
-
-//       if (handled) {
-//         processedIdsRef.current.add(key);
-//       } else {
-//         remainingResults.push(result);
-//       }
-//     }
-//     return remainingResults;
-//   });
-// }, [resultList, WebSocket.USING_WEBSOCKET]);
-
-// useEffect(() => {
-//   const interval = setInterval(() => {
-//     console.log("console in interval 1", updateTimerResult.workId, "at", new Date().toLocaleTimeString());
-    
-//     if (updateTimerResult == null) {
-//       console.log("true");
-//       setVideoPaused(false);
-//       if (!videoPaused) {
-//         setVideoPaused(true);
-//       }
-//     } else {
-//       console.log("false");
-//       setUpdateTimerResult(null);
-//     }
-
-//   }, 7000);
-
-//   return () => clearInterval(interval);
-// }, []); // 👈 only run once
-
 
 
 
 useEffect(() => {
-   console.log("hello 4");
    setVideoPaused(isPlayerConnected);
 }, [isPlayerConnected]);
 
@@ -102,8 +36,10 @@ useEffect(() => {
         handled = true;
         break;
       case "PLAY_PAUSE":
-        startTransition(() => setLockPlayPauseButton(false));
-        startTransition(() => setVideoPaused(result.data));
+        setTimeout(() => {
+          startTransition(() => setLockPlayPauseButton(false));
+          startTransition(() => setVideoPaused(result.data));
+        }, 300);
         handled = true;
         break;
       case "PLAYINLOOP":
@@ -115,7 +51,6 @@ useEffect(() => {
         handled = true;
         break;
       case "ISBUFFERING":
-        console.log("ISBUFFERING", result.data);
         startTransition(() => setIsBuffering(result.data));
         handled = true;
         break;

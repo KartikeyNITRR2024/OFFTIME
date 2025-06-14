@@ -19,12 +19,9 @@ function useUpdateTimerCheck(updateTimerResult, setIsPlayerConnected) {
         const now = new Date();
         const refTime = new Date(latest);
         const diffInSeconds = Math.abs((now - refTime) / 1000);
-        console.log("hello 2", refTime," ",now+" "+diffInSeconds);
         if (diffInSeconds < 6) {
-          console.log("hello 3 less then 6");
           setIsPlayerConnected(true);
         } else {
-          console.log("hello 3 not less then 6");
           setIsPlayerConnected(false);
         }
       }
@@ -52,7 +49,6 @@ export default function WebsocketState(props) {
     const toastId = toast.loading("Connecting to server...");
 
     if (clientRef.current && clientRef.current.connected) {
-      console.log("Already connected.");
       return;
     }
 
@@ -64,7 +60,6 @@ export default function WebsocketState(props) {
 
           if (result.workId === "ISPLAYING") {
             const dateObject = new Date(result.timestamp);
-                        console.log("hello 1", dateObject);
             setUpdateTimerResult(dateObject);
           } else {
             setResult(result);

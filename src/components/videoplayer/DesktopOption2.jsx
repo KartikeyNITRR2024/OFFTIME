@@ -51,19 +51,26 @@ const DesktopOption2 = ({ trimmedCode }) => {
   }, [videoPaused]);
 
   useEffect(() => {
-    if (WebSocket.USING_WEBSOCKET) {
-      const workDetail = {
-        pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
-        workType: "VIDEO",
-        uniqueCode: trimmedCode,
-        workId: "ISBUFFERING",
-        payload: isBuffering
-      };
-      sendWork(workDetail);
-    } else {
-      alert("WebSocket is not using, please check your connection.");
-    }
-  }, [isBuffering]); 
+  let timeout;
+
+  if (isBuffering) {
+    timeout = setTimeout(() => {
+      if (WebSocket.USING_WEBSOCKET && isBuffering) {
+        const workDetail = {
+          pathUniqueId: Microservices.OFFTIME_VIDEOPLAYER.ID,
+          workType: "VIDEO",
+          uniqueCode: trimmedCode,
+          workId: "ISBUFFERING",
+          payload: true
+        };
+        sendWork(workDetail);
+      }
+    }, 1500);
+  }
+
+  return () => clearTimeout(timeout); 
+}, [isBuffering]);
+
 
   useEffect(() => {
   if (!currentVideo) return;

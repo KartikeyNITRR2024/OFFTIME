@@ -59,7 +59,7 @@ function Controller({ trimmedCode }) {
         payload: videoPaused
       };
       sendWork(workDetail);
-    }, 1500); 
+    }, 2000); 
   } else {
     alert("WebSocket is not using, please check your connection.");
   }

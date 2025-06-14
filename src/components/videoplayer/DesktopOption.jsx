@@ -63,7 +63,7 @@ const DesktopOption2 = ({ trimmedCode }) => {
         payload: videoPaused
       };
       sendWork(workDetail);
-    }, 1500);
+    }, 2000);
   } else {
     alert("WebSocket is not using, please check your connection.");
   }
@@ -87,7 +87,7 @@ const DesktopOption2 = ({ trimmedCode }) => {
         };
         sendWork(workDetail);
       }
-    }, 200);
+    }, 1500);
   }
 
   return () => clearTimeout(timeout); 

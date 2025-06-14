@@ -142,6 +142,7 @@ const DesktopOption2 = ({ trimmedCode }) => {
   const songStartFunction = async () => {
     if (playerRef.current && currentVideo?.lastStopTime >= 0) {
         playerRef.current.seekTo(currentVideo.lastStopTime, 'seconds');
+        await updateVideo(trimmedCode, currentVideo.id, Math.floor(currentVideo?.lastStopTime));
     }
   }
 
